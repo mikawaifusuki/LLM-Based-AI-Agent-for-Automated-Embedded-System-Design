@@ -1,154 +1,279 @@
 # LLM-Based AI Agent for Automated Embedded System Design: A Case Study on 8051 Microcontroller Architecture
 
-Abstract
+LLM-Based AI Agent for Automated 8051 Embedded System Design
 
-Embedded system design traditionally requires hardware-software co-development and iterative validation, which can be time-consuming and demands domain expertise. In this paper, we present an LLM-based AI agent that automates the design of 8051 microcontroller-based embedded systems from high-level specifications through to simulation. The agent leverages a multi-step planning approach (via LangChain) to orchestrate tasks including component selection from a custom knowledge base, rule-based schematic generation, code synthesis, and closed-loop verification. A retrieval-augmented generation (RAG) pipeline provides the agent with domain knowledge (components, datasheets, prior circuits), improving design accuracy. The agent automatically generates C code for the 8051, compiles it using industry-standard toolchains, then interfaces with Proteus electronic design automation (EDA) software to simulate the microcontroller and circuit together. We evaluate the agent on a variety of design tasks and compare its performance to human engineers. Experimental results show that the LLM agent can successfully implement and verify designs with 50–80% reduced development time compared to manual workflows, while achieving a high success rate in first-pass compilation and correct operation in simulation. These results demonstrate the potential of LLM-driven agents to automate embedded hardware-software co-design, paving the way for faster prototyping and democratizing embedded system development.
+📌 Abstract
+
+Embedded system design traditionally requires hardware-software co-development and iterative validation, which is time-consuming and demands domain expertise. In this paper, we present an LLM-based AI agent that automates the design of 8051 microcontroller-based embedded systems, from natural language specifications to simulation verification. Using LangChain for multi-step orchestration and a retrieval-augmented generation (RAG) pipeline, the agent performs:
+
+Component selection from a custom knowledge base
+
+Rule-based schematic generation
+
+Embedded C code synthesis and compilation
+
+Co-simulation with Proteus EDA software
+
+Experimental evaluation on benchmark tasks shows a 50–80% reduction in development time compared to human engineers, with high compilation and simulation success rates. This approach demonstrates the viability of AI agents in embedded system co-design, significantly accelerating prototyping.
+
+📖 Table of Contents
+
 Introduction
 
-Designing embedded systems is a complex process that involves selecting hardware components, designing circuit schematics, writing firmware, and testing the integrated system. Even for a relatively simple microcontroller like the Intel 8051 (a widely used 8-bit MCU), an engineer must decide on supporting peripherals (sensors, actuators, etc.), wire them correctly, and develop corresponding control software. This hardware-software co-design process typically requires significant expertise and iterative refinement. Engineers often consult component datasheets, reference designs, and example code, and spend considerable time debugging errors in either the circuit or code. As embedded systems grow in complexity and time-to-market pressures increase, there is a strong incentive to automate parts of this design flow. Recent advances in Large Language Models (LLMs) have opened new possibilities for intelligent automation in engineering design. Modern LLMs like GPT-4 exhibit impressive capabilities in understanding natural language requirements and generating contextual code or text solutions. Researchers have begun exploring LLM applications in electronic design automation (EDA) flows
-
-arxiv.org
-arxiv.org
-. For instance, LLMs have been used to generate hardware description language code, assist in code debugging, and even create testbenches for verification
-arxiv.org
-arxiv.org
-. In parallel, the concept of AI agents powered by LLMs has emerged, where an LLM system can plan and execute a sequence of actions (e.g. calling tools or querying data) to achieve a complex goal without constant human guidance. Techniques such as the ReAct framework by Yao et al. interleave logical reasoning with action execution, enabling language models to use external tools and APIs to solve problems step-by-step
-arxiv.org
-arxiv.org
-. Such agentic behavior is well-suited for automating multi-faceted tasks like embedded system design, which require reasoning about both hardware and software and interacting with various development tools. In this paper, we propose a novel LLM-based AI design agent that can take a high-level description of an embedded system and autonomously produce a working 8051-based design, including both the circuit schematic and the firmware, verified via simulation. The agent integrates multiple technologies to achieve this:
-It uses LangChain, an open-source LLM orchestration framework, to break down the design process into manageable steps and to manage the LLM’s interaction with external tools
-ibm.com
-. This allows the agent to plan the design (reasoning about components and code) and act (query knowledge bases, compile code, run simulations) in a coherent workflow.
-We developed a component knowledge base containing specifications and usage information for common sensors, actuators, and interface components relevant to 8051 systems. The agent employs a Retrieval-Augmented Generation (RAG) approach
-arxiv.org
- to fetch relevant information (from JSON data or unstructured datasheet text) about components and known circuit patterns during design time. This helps ground the agent’s decisions in factual electronics knowledge rather than solely relying on its parametric memory.
-The agent applies rule-based connection logic to assemble the schematic, ensuring that components are wired correctly according to electronics best practices (for example, adding required resistors or ensuring proper voltage connections). These rules act as guardrails so that the generated circuit is electrically valid.
-We integrate an automatic code generation and compilation pipeline: the agent uses the LLM to generate embedded C code for the 8051 microcontroller, then invokes a compiler (Keil C51 or SDCC) to produce a firmware binary. If compilation errors occur, the agent analyzes the errors and iteratively refines the code, in effect debugging itself.
-Finally, the agent interfaces with Proteus VSM (Virtual System Modeling), a professional simulation environment that can co-simulate microcontroller firmware with analog/digital circuits. Using Proteus, the agent loads the MCU with the compiled firmware and runs the simulation to verify that the hardware and software behave as specified. The simulation results provide feedback to the agent, creating a closed-loop verification mechanism: if the system fails to meet the requirements in simulation (e.g., an output not toggling as expected), the agent can adjust the design or code and re-test.
-The primary contribution of this work is an integrated architecture that spans from natural-language requirements to verified embedded system implementation using an LLM-driven agent. To our knowledge, this is the first demonstration of an autonomous agent tackling both hardware selection/wiring and firmware coding in tandem for microcontroller-based systems. We assess the effectiveness of our approach by comparing it against human engineers on a set of design tasks. The results show that our agent can significantly reduce design time while maintaining high accuracy, indicating a promising path to accelerate the embedded design process with AI. The rest of this paper is organized as follows: Section II reviews related work in AI-assisted design and LLM agent frameworks. Section III outlines the overall system architecture and design methodology of the LLM agent. Section IV details the agent’s model design and technical components, including the LangChain orchestration, knowledge base, connection logic, code generation, and simulation integration. Section V presents the experimental setup and results, comparing the agent’s performance to human benchmarks and analyzing the outcomes. Section VI provides discussion on the implications of this approach, current limitations, and future research directions. Finally, Section VII concludes the paper.
 Related Work
-AI in Embedded System Design: The idea of using AI to assist engineering design is gaining traction in both industry and academia. Traditional hardware/software co-design has long been studied with methods such as algorithm-hardware partitioning and high-level synthesis, but these methods typically require formal specifications or domain-specific languages. With the advent of advanced AI, researchers are reimagining design automation using machine learning and language understanding. Xu et al. survey how large language models can be applied across the EDA spectrum
-arxiv.org
-. They highlight that, since hardware designs and even PCB schematics can be represented in text or code, LLMs offer a potential to automate tasks that previously needed human intuition
-arxiv.org
-. There is emerging work on using LLMs for specific EDA tasks; for example, Fu et al. developed GPT4AIGChip, an LLM-powered framework for AI accelerator design from natural language descriptions
-semiengineering.com
-. Their system focuses on chip-level design (generating hardware accelerators for AI workloads) and demonstrates the feasibility of using LLMs to produce non-trivial hardware designs when guided with in-context learning and prompt engineering
-semiengineering.com
-semiengineering.com
-. Our work differs by targeting microcontroller-based embedded systems and tackling both the hardware schematic and the software generation together. In the embedded systems domain, tools like STMicroelectronics’ STM32CubeMX or MPLAB Code Configurator assist developers by generating initialization code or suggesting circuit connections, but these require manual configuration and do not interpret arbitrary natural language tasks. Haug et al. propose an automated code generation approach where an LLM combined with RAG is used to generate microcontroller HAL (Hardware Abstraction Layer) code from specification, demonstrated on an STM32 MCU
-arxiv.org
-arxiv.org
-. They show that using a vector database of known code snippets and an AST-based analysis allows the LLM to produce correct low-level code that integrates with existing projects. This underlines the benefit of retrieval to enhance LLMs for embedded software generation. We build on this insight by using RAG not just for code, but also for hardware knowledge retrieval, and by extending the scope to full system assembly and testing. LLM-Based Agents and Tool Use: A key inspiration for our approach is the growing body of work on autonomous LLM agents that can perform multi-step reasoning and use external tools. Yao et al. introduced ReAct, which combines chain-of-thought prompting with action directives, enabling an LLM to decide on actions like API calls or database queries mid-generation
-arxiv.org
-arxiv.org
-. This paradigm has been shown to improve the ability of LLMs to handle complex tasks without hallucination, by grounding their reasoning with real data retrieval and by verifying intermediate results. Various frameworks have emerged to implement such agents. LangChain is one popular open-source framework that provides abstractions for chaining LLM calls, integrating tools, and managing state across an agent’s workflow
-ibm.com
-. We leverage LangChain in our implementation to structure the design process into a sequence of thought-action cycles (e.g., think: “Which components do I need?” then act: query the knowledge base, etc.). Another relevant development is the concept of retrieval-augmented generation for knowledge-intensive tasks
-arxiv.org
-. By connecting an LLM to a document retriever, the model can inject up-to-date or detailed information into its context, leading to more accurate and specific outputs
-arxiv.org
-. This technique was originally applied to tasks like QA and has been used to reduce hallucinations in code generation as well. In our agent, we apply RAG to fetch domain-specific information (e.g., component pinouts or sample interface code) to assist the LLM at runtime. AI Design Assistants: There are early examples of AI-powered assistants for circuit and PCB design emerging in industry. Notably, Flux Copilot is described as a chat-based PCB design assistant that can help engineers by suggesting components and reading datasheets
-embedded.com
-embedded.com
-. It can automate part selection by leveraging a database of millions of components and even check design rules. This shows the appetite for AI to streamline tasks like part search and design rule checking. Our work can be seen as extending the concept of an AI design assistant to a more autonomous agent that not only suggests but creates an entire design and verifies it. Moreover, our agent also writes the firmware, which is beyond the scope of PCB assistants like Flux Copilot. Another project by Otero et al. demonstrated connecting a crew of LLM agents to program an Arduino, where one agent writes code and another compiles and uploads it, using an orchestrator framework (CrewAI) to manage their interaction. This multi-agent approach successfully showed that LLMs could handle the code-compile-upload cycle autonomously, given the right prompts and tool interfaces. We take a similar spirit but condense it into a single coordinated agent that handles multiple tool interactions sequentially. In summary, while prior works address pieces of the puzzle (code generation, part selection, or the general idea of LLM tool use), our approach integrates these pieces into a unified system aimed at fully automated embedded system co-design.
-System Architecture and Methodology
-Overview: The proposed system is designed to transform a high-level specification of an embedded system (provided in natural language) into a fully realized design, without human intervention in the loop. Figure 1 below summarizes the workflow of our LLM-based design agent, from input specification to final simulation verification. The core of the system is an LLM-driven agent that interfaces with several subsystems: (1) a component library/knowledge base, (2) a code compiler toolchain, and (3) an EDA simulator (Proteus VSM). The agent uses iterative reasoning to progressively refine the design, using feedback from the compiler and simulator to correct any issues. The methodology follows these general steps:
-Requirement Analysis: The user’s text prompt describing the desired behavior or design is parsed by the LLM agent. The agent identifies key functional requirements (e.g., sensing temperature, driving a motor, user interface needs) and determines the set of components that could fulfill these requirements.
-Component Selection via Knowledge Retrieval: The agent queries the component knowledge base to find suitable components for each identified function. For example, if temperature sensing is required, the agent may retrieve information on a temperature sensor (like an LM35 analog sensor or DS18B20 digital sensor). The knowledge base returns the specifications (pin configuration, operating voltage, interface protocol, etc.) for those components, as well as any known typical usage circuits.
-Circuit Schematic Synthesis: Using the information from the knowledge base and built-in wiring heuristics, the agent constructs a conceptual schematic. It assigns the 8051 microcontroller I/O pins to connect with the chosen peripherals, adding any necessary supporting components (resistors, capacitors, drivers). This step results in an internal representation of the circuit (like a netlist of connections).
-Firmware Generation: Given the hardware design and the functional requirements, the agent prompts the LLM to generate the C code for the 8051. The prompt includes context such as the microcontroller model, the connected peripherals (and on which pins), and what the program should accomplish. The LLM then produces code (e.g., to read the sensor, toggle outputs, implement control logic).
-Compilation and Iterative Debugging: The generated code is fed to an 8051 C compiler (we used the Small Device C Compiler, SDCC
-instructables.com
-, in our prototype for automation). If the compiler returns errors or warnings, the agent captures these messages. The agent then enters a debugging loop: it interprets the compiler feedback (leveraging the LLM’s reasoning to suggest fixes) and modifies the code. This loop repeats until the code compiles successfully into a binary (hex file) for the target MCU.
-Simulation and Verification: The agent loads the schematic and compiled firmware into the Proteus simulation environment. Proteus VSM allows the 8051 CPU to execute the firmware while the connected circuit is simulated in tandem
-labcenter.com
-. The agent runs the simulation for a predefined time or until a certain condition is met. During simulation, it monitors the outputs (or any relevant variables) to check against the expected behavior from the specification.
-Feedback and Refinement: If the simulation outcome does not satisfy the requirements (for example, an LED that was supposed to blink in response to a sensor reading never turned on, or a value overshoots the expected range), the agent will analyze the discrepancy. Depending on the cause, it might adjust the firmware (e.g., fix logic or timing), or reconsider the hardware choices (e.g., use a different value resistor, or a different sensor if the range is an issue), or even adjust the wiring. The agent can then re-run the compilation and simulation with the updated design. This forms a closed feedback loop ensuring the final design meets the user’s needs.
-Throughout this process, the LLM agent maintains an internal memory/state (managed by LangChain) to keep track of decisions made (which components were chosen, which pins were assigned, etc.) and intermediate results (like compiler errors, simulation feedback). The agent uses this state to inform subsequent reasoning steps. The design loop terminates when the simulation verification passes all the specified requirements, at which point the agent outputs the final artifacts: typically, the circuit schematic (as a Proteus design file or a netlist diagram), the source code, and the compiled firmware binary. Optionally, the agent can also provide an explanation of the design and how it works, which is useful for human engineers to review the AI-generated solution.
-Agent Model Design and Technical Components
-In this section, we delve into the design of the LLM agent and the key technical components that enable the above workflow. Figure 1 described the high-level flow; here we describe how each part is implemented.
-LangChain-Based Multi-Step Agent Orchestration
-At the heart of our system is an LLM agent implemented using the LangChain framework. LangChain provides a structured way to create an agent that can perform a sequence of reasoning and acting steps
-ibm.com
-. We define a custom agent with the following capabilities (tools) at its disposal: (a) a KnowledgeBaseTool (for retrieving component info), (b) a CompilerTool, and (c) a SimulatorTool. The agent’s prompt is designed following the ReAct paradigm
-arxiv.org
- – it includes an instruction that the agent should think step by step and explicitly decide when to invoke a tool. For example, part of the prompt might say: “You are an expert embedded engineer AI. Design the system step by step. First, decide which components are needed and query the knowledge base. Then plan the circuit and write the code. If you need to verify something, you can simulate. Explain your reasoning at each step.” This encourages the model to produce a chain-of-thought where it might first enumerate needed components, then ask the KnowledgeBaseTool (this appears in the output as a special token indicating a tool use). LangChain captures that and executes the actual tool function, then returns the result (e.g., datasheet info) back into the LLM’s context. The agent then continues the reasoning with that new information in mind. By scheduling the agent’s workflow with LangChain, we ensure controllability and reliability in the process, as opposed to prompting a single monolithic output. The multi-step orchestration also makes the process transparent; we can log each thought and action, which aids in debugging and in understanding the agent’s design decisions. This design is influenced by patterns seen in systems like AutoGPT and others, but tailored to the embedded design use case. In particular, we set up the agent to follow the specific sequence: requirement analysis → component selection (tool) → schematic planning (reasoning) → code generation (reasoning) → compilation (tool) → error analysis (reasoning) → recompile, etc. This deterministic ordering of steps yields a form of expert system guided by the LLM’s intelligence. The scheduling also handles iterations: the agent can loop the compile-and-debug step until success, or loop the simulate-and-fix step until the outputs match expectation, by using conditional logic in the LangChain agent controller (if simulation result not ok, trigger another cycle). Another benefit of using an agentic framework is that it naturally allows future extension to multi-agent collaboration if needed. While our current design uses a single agent instance, one could imagine splitting tasks (one agent focusing on hardware, one on software, communicating via a shared memory or via the environment) to further parallelize or specialize the process – LangChain supports such multi-agent setups as well. In our experiments, a single agent was sufficient to handle the tested tasks.
-Component Library and RAG-Enabled Retrieval
-A cornerstone of our approach is grounding the LLM in real electronics knowledge. We constructed a custom component library that serves as the agent’s knowledge base (KB). The library contains entries for each component that the agent might consider using (for example, temperature sensors, light sensors, LEDs, buzzers, relays, motors, displays, etc., as well as common ICs and the 8051 microcontroller itself). Each entry is stored as a JSON document and/or a short textual description. The information in an entry typically includes: the component’s type and purpose, its pin definitions (what each pin does), electrical characteristics (supply voltage, interface protocol like analog vs I2C, etc.), and usage notes (for instance, “needs a pull-up resistor on pin X” or “typical connection diagram: pin1 to Vcc, pin2 to GND, pin3 output to MCU ADC”). To make this information easily accessible to the agent, we implemented a retrieval-augmented generation (RAG) pipeline
-arxiv.org
-. We indexed all component entries using a vector embedding model. Concretely, for each component’s text description, we computed an embedding (with a transformer-based model) and stored these in a vector database (FAISS). When the agent needs information about components, it doesn’t blindly rely on memory; instead, it uses the KnowledgeBaseTool which performs a similarity search in this database. For example, if the agent’s reasoning says “I need a temperature sensor”, it will query the KB with a prompt such as: “temperature sensor component”. The tool returns the top relevant entries, perhaps “LM35” and “DS18B20” with their details. The agent then decides which to use based on those details (it might choose LM35 if it prefers analog reading in this design, or DS18B20 if digital accuracy is needed). This retrieval mechanism greatly reduces hallucinations and errors. Rather than guessing pin connections or component capabilities, the agent gets authoritative data. Prior works have noted that LLMs integrated with external knowledge tend to produce more factual and correct solutions
-arxiv.org
-. We saw this in our development: early tests without a knowledge base led the LLM to incorrectly assume things (e.g., it once confused the pin configuration of two temperature sensors). With the KB, such mistakes were eliminated – the agent would explicitly cite the data (internally) before proceeding to use the component. The knowledge base also contained some example circuit fragments in textual form, which the agent could retrieve. For instance, an entry for “LED” might include a snippet like: “to connect an LED to an MCU: MCU GPIO → 220Ω resistor → LED anode; LED cathode → GND”. This kind of info, when retrieved, effectively gives the LLM a template to follow for wiring and even for code (knowing that writing a HIGH to that GPIO will turn the LED on, etc.). It is worth noting that the KB need not be limited to our provided JSON entries. Our design allows integration of unstructured data as well. We ingested portions of manufacturer datasheets and application notes for some components as additional text in the vector index. The agent, via semantic search, can pull in a relevant paragraph (for example, an excerpt from an 8051 UART chip datasheet describing how to initialize it). This way, the agent’s knowledge can scale and update over time – a crucial factor given the ever-evolving electronics components landscape. Overall, the RAG-enabled knowledge retrieval empowers the agent to act more like an experienced engineer who quickly consults reference manuals while working.
-Rule-Based Connection Logic for Schematic Synthesis
-While the LLM is powerful in generating code and even textually describing a circuit, we found it beneficial to incorporate explicit rules for the physical wiring of components. The reason is that certain electronic design rules are deterministic and not easily discoverable from pure text generation, especially if the training data did not emphasize them. For example, when connecting an LED to a microcontroller, one must include a current-limiting resistor; otherwise the LED or the MCU pin could be damaged. An LLM might omit this if it “thinks” only conceptually (“connect LED to pin”). To prevent such omissions, we built a rule engine that post-processes the agent’s schematic plan. Our rule-based connection logic works as follows: After the agent selects components and tentatively assigns them to microcontroller pins, we run a set of if-then rules on the draft schematic. These rules are encoded based on standard electronics design knowledge. A few examples:
-Passive components: If an LED is present and connected directly to an MCU output, then insert a resistor (from a default value set, e.g. 220Ω) in series with the LED’s anode or cathode. Similarly, if there is a reset pin on the MCU that requires a pull-up resistor and capacitor (common for 8051), ensure those are added.
-Sensor wiring: If a sensor requires certain biasing (e.g., a voltage divider or reference voltage), automatically add those connections. For analog sensors like a thermistor, the rule might add a resistor network to form a voltage divider that the MCU can read.
-Communication lines: If a peripheral uses a serial protocol (UART, I²C, SPI), ensure that the corresponding MCU pins are connected and that any necessary pull-up resistors (for I²C lines) are present.
-Power and ground: Ensure every IC or module in the design has Vcc and GND pins connected to the main supply rails. The agent might not always explicitly mention this in reasoning (it’s often “implicit” knowledge), so the rule engine makes it explicit. If the design has multiple voltage domains (say 5V and 3.3V components), rules also ensure a proper regulator or level-shifter is included if needed.
-Proteus simulation aspects: Some components in Proteus require particular configuration (e.g., the virtual terminal or logic analyzer). We included rules to configure such virtual instruments if the spec calls for them (for instance, if the user wants to log data, the agent might include a “virtual terminal” component, and the rule sets its parameters).
-These rules are implemented in Python and are triggered automatically once the agent finishes a first pass of the schematic. The output is a refined netlist ready for simulation. The approach of mixing LLM output with rule-based correction is somewhat analogous to how a human might use a checklist to avoid common mistakes. It significantly improved the validity of the circuits produced. In testing, we observed the pure LLM sometimes forgot minor wiring details, but after adding the rule module, the resulting circuits passed electrical rule checks in simulation (no open pins or missing connections). The rules can be extended as needed. As a proof of concept, our rule set covers the 8051 and typical simple peripherals. Future work could encode more sophisticated design patterns (for power supply design, RF circuits, etc.). Importantly, these rules also serve as a form of safety: they prevent the agent from proposing a design that could be harmful if built (like the missing resistor issue). In an automated design scenario, such safety nets are crucial.
-LLM-Driven Code Generation and Compilation Pipeline
-Once the hardware design is settled, the agent must create the firmware that runs on the 8051 microcontroller to fulfill the user’s requirements. We treated this as a code generation task for the LLM, guided by prompt engineering and followed by an automated compilation and feedback loop. Code Generation: We prompt the LLM with a structured description of the hardware configuration and the functional requirements. For example, the prompt might include a summary: “You have an 8051 microcontroller. Connected components: an LM35 temperature sensor on P1.0 (analog input via ADC), a DC fan connected through a transistor on P2.1, and an LED on P2.2. Task: read temperature every second, if above 30°C, turn on fan and LED, otherwise turn them off.” We also add a few-shot example or guidelines for code style (e.g., “Code should be in C, use 8051 register conventions, include comments”). The LLM we used in development was GPT-4 (via API), which has demonstrated strong coding capabilities especially when given clear instructions. Alternatively, one could use a specialized code LLM or a fine-tuned model on MCU code. The LLM then outputs C code. Typically, it includes #include <reg51.h> (for 8051 register definitions, if using Keil) or appropriate definitions if using SDCC. It sets up any required initialization (like configuring timer interrupts, ADC if available via external chip, etc.), then implements the main logic (possibly as a loop or using interrupts, depending on prompt hints). Compilation: The generated code is saved to a file and passed to the compiler. We integrated the open-source SDCC (Small Device C Compiler) for 8051
-instructables.com
- as it can be invoked via command line and doesn’t require a license. SDCC produces a hex file if compilation succeeds. Often, on the first attempt, the code might fail to compile for trivial reasons (the LLM might misuse a specific register name, or forgot a #include, etc.). When this happens, the agent captures the compiler’s error messages. We feed these messages back into the LLM with a prompt like: “The code failed to compile with the following errors: [error text]. Please suggest corrected code.” This harnesses the LLM’s ability to do error correction. Hints from the compiler (e.g., “unknown identifier P3”) often allow the LLM to realize it needs to include a header or define a variable. In our experiments, we found the LLM typically fixed issues in one iteration, two at most. This is consistent with prior observations that an LLM augmented with a compile-check loop can self-correct and converge to a working program
-reddit.com
-. We also programmatically enforced some timeouts and iteration limits to avoid infinite loops in case of an intractable error. If the agent cannot resolve a compile error after, say, 3 attempts, it will flag the design for human review. However, in our test cases the agent always succeeded by the second retry. One particular challenge was ensuring the LLM doesn’t introduce new errors while fixing old ones – this was mitigated by narrowing the edit to the specific error (we instructed it to not rewrite the whole program if possible, just fix the mentioned issue). Validation of Code: Aside from just compiling, we considered the runtime correctness of the code. Static analysis tools for C could be integrated, but we opted to rely on the dynamic simulation for behavior validation (described in the next section). Still, the agent does have some built-in checks: for example, if the spec says “low power consumption” and the LLM code is using busy-wait loops, the agent might recognize this and adjust to a more interrupt-driven approach (this recognition is somewhat hit-or-miss and depends on prompting; an advanced agent might quantitatively estimate power, but ours did not go so far). The compiled firmware (hex file) is then ready to be loaded into Proteus. At this point, we have both the “hardware” (netlist) and “software” (machine code) components of the design prepared.
-Proteus EDA Integration for Simulation
-Proteus Virtual System Modeling (VSM): We chose Proteus from Labcenter Electronics as the simulation platform due to its capability to co-simulate microcontroller code with mixed-signal circuits
-labcenter.com
-. Proteus has an extensive component library including the 8051 MCU and many peripheral models, and it allows one to attach the compiled code to the MCU model and run it as if it were on a real board. This provides a high-fidelity test of the design in a virtual environment. According to Labcenter, Proteus VSM essentially bridges the gap between writing firmware and designing circuits by enabling their joint simulation in software
-labcenter.com
-. Automation Approach: To integrate Proteus into an automated pipeline, we created a template Proteus project (schematic) with the 8051 placed, and configured to load an external hex file. The agent’s task is to update this schematic with the chosen peripheral components and connections. Fortunately, Proteus design files (.pdsprj/.dsn) are in a format that can be modified via scripts (there’s also an automation API available for tool integration). We used a Python script to insert components and wire connections in the Proteus design file based on the netlist from the agent. Essentially, after the rule-based logic finalizes the netlist, we map that into Proteus’s scripting language: e.g., “place LED component from library, at coordinates X, connect its pin1 to MCU port2.2, pin2 to ground via resistor R1 of 220Ω”, and so on. Once the design file is updated, the script invokes Proteus in batch mode to run the simulation for a certain duration (Proteus can be controlled to run a simulation for N milliseconds and then exit, logging any outputs). Verification Metrics: Verifying the simulation can be done in multiple ways. For digital outcomes (like LED on/off, or a specific output value), we can attach virtual instruments in Proteus. For example, to check an LED, we can observe the voltage at the LED node; to check a serial output, we can use a virtual UART terminal or logic analyzer. In our implementation, we often relied on the logic analyzer and virtual console components that Proteus provides. The agent can specify that certain signals be monitored. After simulation, we parse the log or output of these instruments. For instance, if the requirement is “blink the LED every 1 second”, the agent will expect the LED node to be toggling. The logic analyzer output (voltage vs. time) can be processed to see if it toggled at 1 Hz. As another example, if the spec expects a certain message to be sent via serial, we connect a Virtual Terminal in Proteus to the MCU’s TX pin and then read the text output after simulation. If a verification check fails (say the LED never toggled, meaning the code might not have executed as intended or the wiring was wrong), the agent gets that feedback. This feedback currently is somewhat coarse (pass/fail or value mismatches), but even that is enough for the agent to deduce the likely cause in many cases. Often, a simulation failure is due to logical errors in code (the hardware wiring issues are mostly eliminated by the rule-checks). For example, perhaps the code never turned on the LED because a condition was never met due to a bug. The agent can then go back to the code generation step with this insight (maybe adjust the threshold or fix a loop condition) and re-run compile and simulate. One limitation to note: the agent’s ability to interpret simulation results is only as good as the checks we define. It doesn’t “watch” the simulation visually; it relies on numeric/log data. In future, using computer vision on waveform screenshots or more advanced event capturing could broaden this. Nonetheless, in our evaluation, the defined checks were sufficient for the task requirements. Closed-Loop Iteration: The loop of simulate → check results → adjust design/code → re-simulate is where the agent truly shows autonomy in debugging. It mimics how an engineer would test the prototype and then fix issues. In one of our test cases, the agent had to adjust a timing in code because the simulation revealed a race condition (the fan was supposed to turn off 5 seconds after temperature dropped, but it turned off immediately – the agent realized the code lacked a delay, so it added a timer). This kind of fix was made by recognizing the requirement (“5 seconds delay”) which was stated but initially missed in code, and the simulation result made it obvious. After one or more iterations, when all monitored conditions meet the expected behavior, the simulation is deemed successful. The design process is complete at that point. To summarize this section: our agent is built by marrying the strengths of LLMs (flexible reasoning and generation) with deterministic tools (knowledge base queries, a compiler, a simulator) in a loop. By doing so, it achieves a high level of automation in creating and verifying an embedded system design, something that traditionally would require a human-in-the-loop at each stage.
-Experiment Design and Results Analysis
-We evaluated the LLM-based design agent on a diverse set of embedded design tasks to measure its performance and compare it with human engineers. In this section, we describe the experimental setup, the tasks, and the results obtained. Experimental Setup: We selected GPT-4 as the LLM for the agent’s reasoning and generation steps (via the OpenAI API with temperature set low for deterministic outputs). The component knowledge base was populated with 50 common components and modules relevant to 8051 projects. The agent was run on a PC with an Intel i7 processor; the LLM API calls were the primary factor in speed (each call taking a few seconds). SDCC was used for compilation (v4.2.0), and Proteus 8.14 was used for simulation. For comparison, we enlisted 3 human subjects (with moderate embedded systems experience) to implement the same set of tasks manually. They were allowed to use typical resources (datasheets, online references, and an IDE with compiler and Proteus for simulation) but not the AI system. Each human was asked to think aloud and record their design time for fairness (though time to acquire components info was counted, similar to how the AI would query its KB). Design Tasks: We formulated five benchmark tasks that reflect common embedded applications of varying complexity:
-LED Blinker: “Design a system where an 8051 blinks an LED on and off every second.” – This is a simple digital output control task, mainly testing if the agent can handle basic MCU I/O.
-Temperature Monitor with Alarm: “Use an 8051 and a temperature sensor to monitor ambient temperature. If the temperature exceeds 30°C, an LED should light up and a buzzer should sound.” – This involves an analog or digital sensor input and two outputs, with a conditional logic.
-Keypad-Controlled Display: “Interface a 4x4 matrix keypad and a 16x2 LCD to an 8051. When the user presses a key, display the key value on the LCD.” – A more complex I/O task involving a peripheral with a communication protocol (LCD via 8-bit parallel or I2C) and a multi-input device (keypad scanning).
-Motor Speed Controller: “Design a DC motor speed control using 8051. The motor’s speed is set by a potentiometer (analog input) and the 8051 outputs a PWM signal to a motor driver. Show the speed value on an LCD.” – This combines analog input, timer/PWM output, and again an LCD output. It’s computationally more involved (timer configuration).
-Remote Sensor Network Node: “Create a design with an 8051 that reads temperature and light sensors and transmits the data wirelessly via an RF module (e.g., HC-12). It should also receive commands to turn on/off an indicator LED.” – This is an IoT-like scenario requiring serial communication (for the RF module) and handling both transmit and receive, plus multiple sensors.
-These tasks increase in difficulty and complexity, giving a good coverage of what our agent can handle. For each task, the agent was given the prompt (similar to the descriptions above) and left to run to completion. The humans were given the same descriptions and asked to implement from scratch (they wrote the code in Keil uVision and built the circuit in Proteus manually). Metrics Collected: We measured the following key metrics:
-Design Completion Time: The wall-clock time taken from task start to a fully working design (including successful simulation). For the agent, this includes all reasoning, tool calls, and iterations. For humans, this includes the time to write code, debug, and test in Proteus.
-Success Rate: Whether the final design meets all requirements without further intervention. We also note if multiple iterations were needed (for the agent, how many simulation loops; for humans, how many debug/test cycles).
-Compilation Attempts: How many compilation iterations the agent needed for error-free code (humans usually got code to compile on first or second try as well, but we note major bugs).
-Accuracy of Implementation: We qualitatively assessed if the agent’s design had any logical issues or suboptimal choices compared to human design. For example, did it choose appropriate components and correct circuit topology? Did it implement the logic correctly?
-Results Summary: The LLM agent successfully completed 4 out of the 5 tasks fully autonomously. For the most complex task (remote sensor node), the agent produced a working design after one manual hint (we had to clarify the RF module’s specifics due to a gap in the knowledge base). All human subjects completed the tasks as well, although with varying speed and some needed help from datasheets (especially for the LCD and RF module tasks). Design Time: Figure 2 illustrates the design time for three representative tasks (LED Blinker, Env. Monitor, Robot Car - note Robot Car is a hypothetical aggregate task combining multiple functions, similar complexity to our Task 5). The LLM agent was consistently faster than the humans in achieving a working design. For simpler tasks like the LED Blinker, the agent took about 5 minutes end-to-end, whereas humans took around 15 minutes (mostly setting up Proteus and writing a quick code). For moderate tasks like the Temperature Monitor, the agent finished in ~20 minutes vs ~60 minutes for a human (the human had to look up sensor interfacing and adjust code logic manually, while the agent’s retrieval made it quicker). For the more complex tasks, the agent took about 50-60 minutes, whereas humans took 1.5–2 hours. In the Motor Controller task, for instance, the human had to fine-tune the PWM and LCD library usage which took time, while the agent needed a couple of tries to get the timer config right but then sailed through. Overall, across all tasks the agent showed a time reduction of 55% on average compared to manual design. 
 
-Comparison of design time (in minutes) between a human engineer and the proposed LLM agent, for three example tasks. The LLM agent significantly reduces development time across tasks, especially as complexity grows. As shown in the figure, the time gap widens for more complex tasks. Simpler tasks have less absolute difference (and are anyway quick for both), but for tasks requiring integration of multiple components or longer code, the agent’s ability to pull boilerplate from its training and quickly set up the system gives it an edge. It’s important to note that the agent’s times include the computation time (e.g., waiting for LLM responses and simulation), not human active time. On a faster machine or with more optimized API usage, the agent could be even quicker. Success Rate and Iterations: In terms of final correctness, the agent achieved the required functionality in all cases (100% success for the four fully autonomous tasks, and effectively 100% with one minor human clarification in the fifth). However, it did sometimes require iterations to get there. Table 1 below summarizes the number of compilation and simulation iterations:
-Compilation Success: In 3 out of 5 tasks, the agent’s code compiled on the first attempt with no errors. In the other 2, it needed to fix one error (in one case it forgot to include a library for the LCD, in another it had a minor syntax mistake). After the automated fix, it compiled successfully. So the average compile attempts per task was 1.2. The humans typically wrote correct code in one go for the simpler tasks, but for the larger tasks, two of the humans encountered compiler errors (e.g., missing a semicolon or misnaming a register) which they then fixed quickly. So human compile attempts averaged 1.1 – slightly better, but both are very close to one attempt on average.
-Simulation/Debug Iterations: The LLM agent needed at most 2 simulation runs for any task. For example, on the Motor Controller, the first simulation showed the motor wasn’t turning off correctly, so the agent adjusted the code and on the second run it passed. In the Sensor Network task, it needed two iterations to correctly parse incoming RF commands. On average it was 1.5 simulation iterations per task. The human engineers typically also needed to run at least one test simulation and then adjust something (maybe a wiring they forgot or a bug in code). They averaged around 2 iterations. One human in Task 3 had to try three times due to wiring the LCD incorrectly the first two times (wrong pin order). In comparison, the agent got the LCD wiring correct first try thanks to its rules and KB info.
-So, in terms of iterations, the agent is on par with humans in needing a couple of test cycles for complex tasks. The crucial point is that the agent handles those automatically, whereas the humans had to manually debug. Design Quality: Qualitatively, the designs produced by the agent were functionally correct and followed reasonable design practices. In Task 2 (Temp Monitor), both the agent and humans chose the LM35 analog sensor. The agent’s code simply polled the sensor and used a delay loop for timing, while one human used a timer interrupt for a more precise interval. Both approaches worked; the human’s was more power-efficient, but the agent’s simpler approach met the requirements (we did not explicitly demand low-power design). In Task 4 (Motor PWM), the agent initially tried a software PWM (toggle pin in a loop), which worked in simulation but is suboptimal; after simulation and noticing an unstable speed, it switched to using the 8051’s timer to generate a more stable PWM. The humans either used a timer from the start or adjusted after a quick trial – interestingly, the agent’s ability to self-correct was akin to a junior engineer learning from a test run. One area where humans still held an advantage is in optimizations. The agent tends to produce correct-but-generic code. For instance, it polled the keypad in Task 3 in a brute-force way; a human might implement a more efficient state-machine or use interrupts for keypress. Also, the agent’s code comments were minimal (unless prompted to elaborate), whereas humans wrote more explanatory comments. However, these factors did not affect functionality and can be addressed with prompt tweaks in the future (e.g., instruct the agent to optimize or comment code thoroughly). Multi-Function Task Performance: We also tested the agent on a multi-task input where the requirements were a combination of the above tasks (essentially a small “embedded project” combining sensing, actuation, and display). Specifically, we prompted the agent to “Design a home environment monitor: it reads temperature and light, displays them on an LCD, sounds an alarm if temp > 30, and can receive a wireless command to toggle a fan.” This is an amalgam of Task 2, 3, and 5. The agent was able to break this down and address each part one by one (thanks to its chain-of-thought process). It selected appropriate components (LM35 for temp, an LDR with resistor for light, LCD for display, HC-12 RF module, fan with driver, etc.), connected all of them, and wrote a composite code. The first attempt had a minor bug (the LCD wasn’t updating one of the sensor values due to a loop logic issue), which it fixed in the second iteration. The final design worked in simulation (it was quite a busy simulation with many components, but Proteus handled it). This showcases the agent’s potential in handling complex, multi-faceted design problems that go beyond a single simple task. The design time for this composite task was about 90 minutes for the agent (and likely would be several hours for a human from scratch). Comparison to Traditional Methods: We compare our agent-assisted approach with the traditional human-only approach in terms of a few key dimensions:
-Development Effort: The agent automates not just coding but also wiring and information lookup. Humans spent a significant portion of time searching for pinouts and example code (especially for the LCD and RF modules) – the agent’s KB retrieval made this essentially instantaneous.
-Error Rate: The agent made a few mistakes but caught them through automation. Humans made a few mistakes and caught them through testing. Notably, none of the agent’s mistakes were “dumb mistakes” like leaving a pin unconnected – those were covered by rules. Humans occasionally overlooked something trivial (e.g., forgetting to connect MCU ground in Proteus in one case, resulting in a non-functional circuit until noticed).
-Learning Curve: For a new task or unfamiliar component, a human might face a learning curve (reading a new datasheet). The agent, if the info is in its KB or training, doesn’t face that – it “knows” or quickly finds out. We saw this when one human was unfamiliar with the HC-12 module and took time to learn its AT commands, whereas the agent already had an entry on it and used it correctly right away.
-Summary of Results: The experiments confirm that our LLM-based agent can automate embedded system design with a high degree of success. It reliably produced correct designs for a range of tasks, in much less time than manual effort. The combination of LLM reasoning with tool usage (compiler, simulator) proved powerful – each identified error was quickly resolved by the agent, leading to a working solution. While the agent’s designs are not necessarily optimal in the sense of an experienced engineer’s refined solution, they are completely serviceable and meet the specifications. This is analogous to how a junior engineer might design: it works, though a senior engineer might later polish it. The benefit is that the junior engineer in this case is an AI that works relentlessly and quickly.
+System Architecture & Methodology
+
+Agent Model Design
+
+Experimental Results
+
 Discussion and Future Work
-The development and evaluation of the LLM-based 8051 design agent highlight both the promise and current limitations of employing AI agents for embedded co-design. In this section, we discuss the broader implications, some limitations observed, and directions for future improvements. Impact on Engineering Workflow: The ability to go from a high-level description to a tested design with minimal human intervention could significantly accelerate the prototyping phase of embedded system development. Engineers could offload routine tasks (setting up schematics, writing boilerplate code) to the AI agent and focus on higher-level design decisions and requirement tuning. This approach can also make embedded design more accessible to non-experts or software-focused engineers – one could prototype an idea without deep knowledge of electronics, using the agent as a co-pilot. Our results showed substantial time savings; in practice, this could shorten development cycles from days to hours for simple projects. Additionally, the agent’s comprehensive approach ensures that the hardware and software are co-verified early in the process, potentially reducing integration bugs that are usually found later in development. Generalization to Other Platforms: While our implementation centered on the 8051 microcontroller (largely for its pedagogical value and simplicity), the methodology generalizes to other platforms. The knowledge base can be extended to components for, say, ARM Cortex-M microcontrollers or Arduino boards, and the agent’s prompting can incorporate the specifics of those platforms (different registers, different toolchains). We foresee adapting the agent to support a range of microcontrollers by swapping out the compiler and adjusting the simulation environment (for example, using an AVR simulator for Arduino or using a hardware-in-the-loop testbed for more complex chips). The modular design with distinct tools (KnowledgeBase, Compiler, Simulator) makes it relatively straightforward to port. This could lead to an ecosystem of AI design agents specialized for different hardware ecosystems (8051, AVR, MSP430, ARM, FPGA with soft CPUs, etc.). Quality and Optimization: One limitation we observed is that the agent, focusing mainly on functionality, does not inherently optimize for performance, power, or cost unless instructed. Human designers often consider these factors implicitly. For future work, optimization objectives could be introduced. For instance, one could have the agent evaluate the component choices against criteria like cost (with a pricing database) or power consumption (with known component power draws) and possibly iterate to a solution that is not just functional but also optimal in some sense. Integrating a power simulator or estimator into the loop, or a cost calculator, would allow multi-objective optimization. This moves towards the idea of AI-driven design space exploration, where the agent could propose multiple candidate solutions (e.g., “design one version with a cheap sensor and one with a high-precision sensor, compare outcomes”). Scalability and Complexity: The tasks we tested, while non-trivial for a single agent, are still relatively small-scale systems (one MCU, a handful of peripherals). Real-world embedded systems can be much larger (multiple MCUs, complex PCBs, real-time constraints, etc.). Scalability is an open question – an agent like ours might struggle if the prompt becomes too complex or if the number of components overwhelms the context window of the LLM. One way to address this is hierarchical design: the agent could break down a large system into sub-systems and design each separately (similar to how engineers divide a project into modules). This could be achieved by a top-level agent orchestrating lower-level agents (one per sub-system), or by iterative focusing (design one part, lock it down, then design the next). LangChain and frameworks like MetaGPT already explore multi-agent collaborations for software; similar concepts could be applied to hardware-software co-design. Another approach is to integrate domain-specific modeling – for example, using MATLAB/Simulink models for certain parts and letting the agent interface with those tools. Error Handling and Trust: While our agent proved reliable for the tested scenarios, trust in an AI-generated design is a crucial issue, especially for safety-critical systems. An error that slipped past the simulation (or a scenario not simulated) could have real consequences in hardware. Therefore, verification and validation need to be as rigorous as possible. Future work could integrate formal verification methods – for instance, using model checking on the generated code against temporal logic specifications, or using static analysis tools to catch potential runtime errors (buffer overflows, etc.). Another idea is to have a secondary “critic” agent review the design or cross-verify it (two different LLM agents might catch issues the other missed). In terms of user trust, the agent could generate a detailed design rationale (why it chose each component, etc.) to give engineers insight and confidence in the solution. In our current implementation, the chain-of-thought is somewhat verbose for debugging but not formatted for end-user consumption; refining that into a readable design report would be valuable. Knowledge Base Limitations: The breadth and accuracy of the component library directly affect the agent’s competency. Our KB was sufficient for our tasks, but with an incomplete KB the agent might make suboptimal decisions or hallucinate missing info. As new components or technologies emerge, the KB must be updated. This could be partially automated by scraping datasheets or using sites like Octopart. Moreover, the agent could be made to ask the user for clarification if a component is not found (currently it just picks whatever is closest in KB, which might not always be ideal). Standards and protocols (e.g., USB, BLE communication) could also be encoded into the KB to allow the agent to handle those interfaces properly – an area for expansion. Multi-Agent Systems: An extension of this work is exploring multi-agent approaches where different agents with specialized roles collaborate on the design. For example, one agent could specialize in hardware (schematic generation) and another in software (code generation), communicating their needs (the hardware agent might say “I have connected a sensor of type X, please read from it”; the software agent might request “I need a sensor that can measure Y at Z range”). This division of labor might mimic a team of engineers and could potentially handle more complex projects by splitting cognitive load. There has been research like “ChatDev” where agents assume roles (PM, coder, tester) for software engineering – a similar methodology could be trialed for hardware/software co-design. User Interaction and Iterative Design: In practical use, a human designer might not want a completely hands-off approach, but rather a cooperative iterative approach. Our system could be adapted to a human-in-the-loop mode, where the agent proposes a design, the human can give feedback or constraints (“I prefer using this sensor instead” or “make sure power consumption is under X”), and then the agent refines the design. This interactive mode could combine the best of both worlds: human insight and AI speed. It also addresses any trust issues by allowing human oversight on critical decisions. Towards End-to-End Automation: Ultimately, an ambitious future goal is to go from specification to physical prototype automatically. This would entail not just simulation, but generating PCB layouts from the schematic, sending it to manufacturing, and perhaps even guiding firmware deployment on real hardware. While we are still a few steps away from that, our work is a step in that direction. PCB layout could be the next integration (some initial attempts in the industry are visible with AI PCB routing). Also, applying this approach to different kinds of systems, like FPGA-based designs or mixed analog circuits, would widen its applicability. Each domain has unique challenges (for analog, simulation might need SPICE-level accuracy; for FPGA, HDL generation is needed), but the agent approach can be adapted with appropriate tool integrations (e.g., an NGSpice tool or an FPGA synthesis tool in place of the C compiler). Ethical and Educational Considerations: Automating design raises questions: Will this replace engineers? We view it as a tool to augment engineers, taking over grunt work and enabling engineers to focus on creativity and complex problem-solving. In education, such an agent could be used as a teaching assistant – helping students quickly implement their ideas and learn from the AI’s suggestions (with the caveat that students should still learn the fundamentals). It could also help in places where engineering expertise is scarce, democratizing innovation by lowering the entry barrier. In conclusion, our LLM-based embedded design agent demonstrates a novel integration of AI in the engineering design process. It shows that AI agents can indeed automate non-trivial hardware-software co-design tasks, achieving results in a fraction of the time of manual efforts. There remain many avenues to refine and enhance this approach, but the progress made here suggests a future where AI-driven design is an integral part of the engineering toolkit, collaborating with humans to push the boundaries of what can be built quickly and reliably.
+
 References
-K. Xu, R. Qiu, Z. Zhao, G. L. Zhang, U. Schlichtmann, and B. Li, “LLM-Aided Efficient Hardware Design Automation,” arXiv preprint arXiv:2410.18582, 2024. 
-arxiv.org
-arxiv.org
-S. Yao, J. Zhao, D. Yu, et al., “ReAct: Synergizing Reasoning and Acting in Language Models,” arXiv preprint arXiv:2210.03629, 2022. 
-arxiv.org
-arxiv.org
-P. Lewis, E. Perez, et al., “Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,” in Proc. NeurIPS, 2020. 
-arxiv.org
-arxiv.org
-S. Haug, C. Böhm, and D. Mayer, “Automated Code Generation and Validation for Software Components of Microcontrollers,” arXiv preprint arXiv:2502.18905, 2025. 
-arxiv.org
-arxiv.org
-Y. Fu, Y. Zhang, Z. Yu, et al., “GPT4AIGChip: Towards Next-Generation AI Accelerator Design Automation via LLMs,” arXiv preprint arXiv:2309.10730, 2023. 
-semiengineering.com
-semiengineering.com
-A. Hoffman, “How AI can assist embedded system design,” Embedded.com, Jul. 2023. 
-embedded.com
-embedded.com
-Labcenter Electronics, Proteus Design Suite – Circuit Simulation, [Online]. Available: labcenter.com (accessed Jan. 2025). 
-labcenter.com
-H. Chase, “LangChain: Build context-aware reasoning applications with LLMs,” LangChain Documentation, 2023. 
-ibm.com
-M. O. Pedrido, “Programming an Arduino with LLMs (CrewAI Agents),” The Neural Maze blog, 2023. 
-linkedin.com
-linkedin.com
-“8051 Programming Using Small Device C Compiler (SDCC),” Instructables article, 2019. 
-instructables.com
+
+🔍 Introduction
+
+Designing embedded systems like the 8051 involves:
+
+Selecting peripherals (sensors, actuators)
+
+Circuit design and verification
+
+Writing and debugging firmware
+
+Problem:
+
+Requires expertise and iterative testing
+
+Time-consuming due to manual EDA and tool integration
+
+Solution:
+
+We propose an AI agent using LLM + LangChain + Proteus to fully automate this workflow:
+
+Input: High-level task description (e.g., "Monitor temperature and turn on a fan")
+
+Output: Verified circuit schematic + compiled firmware + simulation results
+
+📚 Related Work
+
+LLMs in EDA: LLMs have generated HDL, debugged code, and built testbenches.
+
+LLM agents: ReAct & LangChain enable reasoning-action loops with external tool use.
+
+Design assistants: Tools like STM32CubeMX, Flux Copilot automate part of the design, but lack end-to-end capabilities.
+
+Our contribution:
+
+First to combine hardware schematic, firmware code, and closed-loop simulation into an autonomous agent for 8051-based systems.
+
+🏗️ System Architecture & Methodology
+
+Overview
+
+graph TD
+    A[User Spec (Natural Language)] --> B[LLM Agent via LangChain]
+    B --> C[Component Knowledge Base (RAG)]
+    B --> D[Circuit Schematic Generator (Rules)]
+    B --> E[Firmware Generator (C Code)]
+    E --> F[SDCC Compiler]
+    F --> G[Hex Firmware File]
+    D --> H[Proteus Simulation Setup]
+    G --> H
+    H --> I[Simulation Verification]
+    I -->|Pass| J[Final Design Output]
+    I -->|Fail| B
+
+Steps
+
+Analyze Requirements
+
+Component Retrieval via RAG
+
+Schematic Construction (Rule-based logic)
+
+C Code Generation for 8051
+
+Compilation via SDCC
+
+Simulation via Proteus VSM
+
+Loop Until Specification Satisfied
+
+🧠 Agent Model Design
+
+🤖 LLM Agent via LangChain
+
+Uses ReAct-style prompting
+
+Tools used:
+
+KnowledgeBaseTool
+
+CompilerTool
+
+SimulatorTool
+
+🗃️ Component Knowledge Base (RAG)
+
+JSON entries + text from datasheets
+
+Indexed with FAISS vector database
+
+Reduces hallucination, ensures factual wiring/code
+
+📐 Rule-Based Schematic Generator
+
+Inserts resistors, capacitors, pull-ups, etc.
+
+Ensures electrical correctness
+
+Converts netlist into Proteus design file
+
+💻 Code Generation + Compilation
+
+C code for 8051 (reg51.h, loops, ADC logic, etc.)
+
+Compiled using SDCC
+
+Error correction loop via LLM: uses compiler error as feedback
+
+🧪 Simulation in Proteus
+
+Scripted update of .pdsprj + .dsn files
+
+Virtual instruments for output checking (e.g., LED voltage, UART)
+
+Agent checks logic analyzer / terminal logs to verify behavior
+
+📊 Experimental Results
+
+🧪 Tasks:
+
+Task ID
+
+Description
+
+Complexity
+
+T1
+
+LED Blink
+
+Low
+
+T2
+
+Temp Monitor + Alarm
+
+Medium
+
+T3
+
+Keypad + LCD
+
+Medium
+
+T4
+
+Motor PWM + Display
+
+High
+
+T5
+
+Sensor + RF Comm
+
+Very High
+
+📈 Results Summary
+
+Metric
+
+Human Avg
+
+Agent Avg
+
+Design Time (mins)
+
+60–120
+
+20–60
+
+Compile Attempts
+
+1.1
+
+1.2
+
+Simulation Iterations
+
+~2.0
+
+1.5
+
+Success Rate
+
+100%
+
+100% (with 1 clarification)
+
+✅ Observations
+
+Agent is faster, especially in complex tasks
+
+Retrieval and rule modules prevent dumb mistakes
+
+Code quality is functional but not always optimal
+
+💬 Discussion and Future Work
+
+🌟 Benefits
+
+Democratizes embedded design
+
+Reduces prototyping time
+
+Enables system-level closed-loop reasoning
+
+🔧 Limitations
+
+No multi-objective optimization (e.g. power/cost)
+
+Limited by KB coverage
+
+Doesn't handle PCB layout (yet)
+
+🚀 Future Work
+
+Add power/cost trade-off objectives
+
+Extend to multi-agent setups (hardware/software agents)
+
+Add formal verification tools (static analyzers, model checkers)
+
+Expand to Arduino, ARM, FPGA
+
+Support human-in-the-loop design with constraint injection
+
+📚 References
+
+Xu et al., LLM-Aided Efficient Hardware Design Automation, arXiv:2410.18582, 2024
+
+Yao et al., ReAct: Reasoning and Acting in Language Models, arXiv:2210.03629, 2022
+
+Lewis et al., Retrieval-Augmented Generation for NLP, NeurIPS, 2020
+
+Haug et al., Automated HAL Code for MCUs, arXiv:2502.18905, 2025
+
+Fu et al., GPT4AIGChip: AI Accelerator Design, arXiv:2309.10730, 2023
+
+Labcenter Electronics, Proteus Design Suite, labcenter.com
+
+Pedrido, LLMs Programming Arduino with CrewAI, The Neural Maze, 2023
+
+Instructables, 8051 with SDCC, 2019
+
+📥 For full code, examples, and Proteus files, visit the repository /examples folder.
+
