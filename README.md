@@ -20,11 +20,11 @@ Experimental evaluation on benchmark tasks shows a 50–80% reduction in develop
 
 ## Table of Contents
 
-- [Introduction](#Introduction) 
+[Introduction](#Introduction) 
 
-- [Related Work](#Related-Work)  
+[Related Work](#Related-Work)  
 
-- [System Architecture & Methodology](#System-Architecture--Methodology)  
+[System Architecture & Methodology](#System-Architecture--Methodology)  
 
 [Agent Model Design](#Agent-Model-Design)  
 
