@@ -1,5 +1,8 @@
 # LLM-Based AI Agent for Automated Embedded System Design: A Case Study on 8051 Microcontroller Architecture
 
+👉 For implementation details and code usage instructions, please refer to the dedicated code README: [examples/embedded-agent](https://github.com/mikawaifusuki/LLM-Based-AI-Agent-for-Automated-Embedded-System-Design/tree/main/examples/embedded-agent)
+
+
 # 📌 Abstract
 
 Embedded system design traditionally requires hardware-software co-development and iterative validation, which is time-consuming and demands domain expertise. In this paper, we present an LLM-based AI agent that automates the design of 8051 microcontroller-based embedded systems, from natural language specifications to simulation verification. Using LangChain for multi-step orchestration and a retrieval-augmented generation (RAG) pipeline, the agent performs:
