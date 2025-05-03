@@ -75,7 +75,7 @@ First to combine hardware schematic, firmware code, and closed-loop simulation i
 <a id="System-Architecture--Methodology"></a>  
 ## System Architecture & Methodology
 
-- **Overview
+- ** Overview
 
  graph
 
