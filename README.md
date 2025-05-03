@@ -1,7 +1,6 @@
 # LLM-Based AI Agent for Automated Embedded System Design: A Case Study on 8051 Microcontroller Architecture
 
-👉 For implementation details and code usage instructions, please refer to the dedicated code README: [examples/embedded-agent](https://github.com/mikawaifusuki/LLM-Based-AI-Agent-for-Automated-Embedded-System-Design/tree/main/examples/embedded-agent)
-
+👉 For implementation details and code usage instructions, please refer to the dedicated code README: embedded-agent/README.md
 
 # 📌 Abstract
 
