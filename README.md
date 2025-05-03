@@ -94,6 +94,9 @@ graph TD
     
     I -->|Fail| B
 
+![image](https://github.com/user-attachments/assets/64df64ee-c99f-4090-a2f9-60e4209e323d)
+
+
 Steps
 
 Analyze Requirements
