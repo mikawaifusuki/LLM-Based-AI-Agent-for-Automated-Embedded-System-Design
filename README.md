@@ -77,7 +77,7 @@ First to combine hardware schematic, firmware code, and closed-loop simulation i
 
 **Overview**
 
- **graph**
+ **1.graph**
 
     A[User Spec (Natural Language)] --> B[LLM Agent via LangChain]
     
@@ -101,12 +101,12 @@ First to combine hardware schematic, firmware code, and closed-loop simulation i
     
     I -->|Fail| B
 
-**Framework**
+**2.Framework**
 
 ![image](https://github.com/user-attachments/assets/64df64ee-c99f-4090-a2f9-60e4209e323d)
 
 
-Steps
+**3.Steps**
 
 Analyze Requirements
 
