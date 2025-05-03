@@ -75,7 +75,7 @@ First to combine hardware schematic, firmware code, and closed-loop simulation i
 <a id="System-Architecture--Methodology"></a>  
 ## System Architecture & Methodology
 
-- ** Overview
+**Overview
 
  graph
 
@@ -101,7 +101,7 @@ First to combine hardware schematic, firmware code, and closed-loop simulation i
     
     I -->|Fail| B
 
-- **Framework
+**Framework
 
 ![image](https://github.com/user-attachments/assets/64df64ee-c99f-4090-a2f9-60e4209e323d)
 
