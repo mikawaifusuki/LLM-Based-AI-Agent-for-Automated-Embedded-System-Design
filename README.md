@@ -136,6 +136,7 @@ Loop Until Specification Satisfied
   CompilerTool
 
   SimulatorTool
+  
 
 --**Component Knowledge Base (RAG)**
 
@@ -144,6 +145,7 @@ Loop Until Specification Satisfied
   Indexed with FAISS vector database
 
   Reduces hallucination, ensures factual wiring/code
+  
 
 --**Rule-Based Schematic Generator**
 
@@ -152,6 +154,7 @@ Loop Until Specification Satisfied
   Ensures electrical correctness
 
   Converts netlist into Proteus design file
+  
 
 --**Code Generation + Compilation**
 
@@ -160,6 +163,7 @@ Loop Until Specification Satisfied
   Compiled using SDCC
 
   Error correction loop via LLM: uses compiler error as feedback
+  
 
 --**Simulation in Proteus**
 
