@@ -5,7 +5,9 @@
 
 # 📌 Abstract
 
-Embedded system design traditionally requires hardware-software co-development and iterative validation, which is time-consuming and demands domain expertise. In this paper, we present an LLM-based AI agent that automates the design of 8051 microcontroller-based embedded systems, from natural language specifications to simulation verification. Using LangChain for multi-step orchestration and a retrieval-augmented generation (RAG) pipeline, the agent performs:
+Traditionally, the design of embedded systems requires the collaborative development and iterative verification of software and hardware, which is very time-consuming and demands domain expertise. Beginners often have a high threshold when building systems like the 8051 single-chip microcomputer, and experienced engineers also find it difficult to avoid repetitive work, which affects the development efficiency.
+
+Against this background, this paper introduces an LLM-based AI agent, which can automate the design of embedded systems based on the 8051 microcontroller, from natural language specifications to simulation verification. This agent uses LangChain for multi-step orchestration and retrieval enhancement generation (RAG) pipelines and can perform the following tasks:
 
 Component selection from a custom knowledge base
 
