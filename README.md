@@ -125,7 +125,7 @@ Loop Until Specification Satisfied
 <a id="Agent-Model-Design"></a>  
 ## Agent Model Design
 
-**1.LLM Agent via LangChain**
+**1. LLM Agent via LangChain**
 
   Uses ReAct-style prompting
 
@@ -138,7 +138,7 @@ Loop Until Specification Satisfied
   SimulatorTool
   
 
-**2.Component Knowledge Base (RAG)**
+**2. Component Knowledge Base (RAG)**
 
   JSON entries + text from datasheets
 
@@ -147,7 +147,7 @@ Loop Until Specification Satisfied
   Reduces hallucination, ensures factual wiring/code
   
 
-**3.Rule-Based Schematic Generator**
+**3. Rule-Based Schematic Generator**
 
   Inserts resistors, capacitors, pull-ups, etc.
 
@@ -156,7 +156,7 @@ Loop Until Specification Satisfied
   Converts netlist into Proteus design file
   
 
-**4.Code Generation + Compilation**
+**4. Code Generation + Compilation**
 
   C code for 8051 (reg51.h, loops, ADC logic, etc.)
 
@@ -165,7 +165,7 @@ Loop Until Specification Satisfied
   Error correction loop via LLM: uses compiler error as feedback
   
 
-**5.Simulation in Proteus**
+**5. Simulation in Proteus**
 
   Scripted update of .pdsprj + .dsn files
 
