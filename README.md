@@ -247,5 +247,5 @@ Pedrido, LLMs Programming Arduino with CrewAI, The Neural Maze, 2023
 
 Instructables, 8051 with SDCC, 2019
 
-📥 For full code, examples, and Proteus files, visit the repository /examples folder.
+📥 For full code, examples, and Proteus files, visit the repository /embedded-agent folder.
 
