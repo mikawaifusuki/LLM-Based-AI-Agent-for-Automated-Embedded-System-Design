@@ -2,7 +2,7 @@
 
 LLM-Based AI Agent for Automated 8051 Embedded System Design
 
-📌 Abstract
+# 📌 Abstract
 
 Embedded system design traditionally requires hardware-software co-development and iterative validation, which is time-consuming and demands domain expertise. In this paper, we present an LLM-based AI agent that automates the design of 8051 microcontroller-based embedded systems, from natural language specifications to simulation verification. Using LangChain for multi-step orchestration and a retrieval-augmented generation (RAG) pipeline, the agent performs:
 
@@ -16,7 +16,7 @@ Co-simulation with Proteus EDA software
 
 Experimental evaluation on benchmark tasks shows a 50–80% reduction in development time compared to human engineers, with high compilation and simulation success rates. This approach demonstrates the viability of AI agents in embedded system co-design, significantly accelerating prototyping.
 
-📖 Table of Contents
+# 📖 Table of Contents
 
 Introduction
 
@@ -32,7 +32,7 @@ Discussion and Future Work
 
 References
 
-🔍 Introduction
+# 🔍 Introduction
 
 Designing embedded systems like the 8051 involves:
 
@@ -56,7 +56,7 @@ Input: High-level task description (e.g., "Monitor temperature and turn on a fan
 
 Output: Verified circuit schematic + compiled firmware + simulation results
 
-📚 Related Work
+# 📚 Related Work
 
 LLMs in EDA: LLMs have generated HDL, debugged code, and built testbenches.
 
@@ -68,7 +68,7 @@ Our contribution:
 
 First to combine hardware schematic, firmware code, and closed-loop simulation into an autonomous agent for 8051-based systems.
 
-🏗️ System Architecture & Methodology
+# 🏗️ System Architecture & Methodology
 
 Overview
 
@@ -112,7 +112,7 @@ Simulation via Proteus VSM
 
 Loop Until Specification Satisfied
 
-🧠 Agent Model Design
+# 🧠 Agent Model Design
 
 🤖 LLM Agent via LangChain
 
@@ -158,9 +158,9 @@ Virtual instruments for output checking (e.g., LED voltage, UART)
 
 Agent checks logic analyzer / terminal logs to verify behavior
 
-📊 Experimental Results
+## 📊 Experimental Results
 
-# Tasks
+Tasks
 
 | Task ID | Description          | Complexity |
 | ------- | -------------------- | ---------- |
@@ -170,7 +170,7 @@ Agent checks logic analyzer / terminal logs to verify behavior
 | T4      | Motor PWM + Display  | High       |
 | T5      | Sensor + RF Comm     | Very High  |
 
-# Results Summary
+## Results Summary
 
 | Metric                | Human Avg | Agent Avg                   |
 | --------------------- | --------- | --------------------------- |
@@ -183,7 +183,7 @@ Agent checks logic analyzer / terminal logs to verify behavior
 
 
 
-✅ Observations
+# ✅ Observations
 
 Agent is faster, especially in complex tasks
 
@@ -191,7 +191,7 @@ Retrieval and rule modules prevent dumb mistakes
 
 Code quality is functional but not always optimal
 
-💬 Discussion and Future Work
+# 💬 Discussion and Future Work
 
 🌟 Benefits
 
@@ -221,7 +221,7 @@ Expand to Arduino, ARM, FPGA
 
 Support human-in-the-loop design with constraint injection
 
-📚 References
+# 📚 References
 
 Xu et al., LLM-Aided Efficient Hardware Design Automation, arXiv:2410.18582, 2024
 
