@@ -75,7 +75,7 @@ First to combine hardware schematic, firmware code, and closed-loop simulation i
 <a id="System-Architecture--Methodology"></a>  
 ## System Architecture & Methodology
 
-**Overview
+- Overview
 
  graph
 
@@ -125,7 +125,7 @@ Loop Until Specification Satisfied
 <a id="Agent-Model-Design"></a>  
 ## Agent Model Design
 
-- **LLM Agent via LangChain
+- LLM Agent via LangChain
 
 Uses ReAct-style prompting
 
@@ -137,7 +137,7 @@ CompilerTool
 
 SimulatorTool
 
-- **Component Knowledge Base (RAG)
+- Component Knowledge Base (RAG)
 
 JSON entries + text from datasheets
 
@@ -145,7 +145,7 @@ Indexed with FAISS vector database
 
 Reduces hallucination, ensures factual wiring/code
 
-- **Rule-Based Schematic Generator
+- Rule-Based Schematic Generator
 
 Inserts resistors, capacitors, pull-ups, etc.
 
@@ -153,7 +153,7 @@ Ensures electrical correctness
 
 Converts netlist into Proteus design file
 
-- **Code Generation + Compilation
+- Code Generation + Compilation
 
 C code for 8051 (reg51.h, loops, ADC logic, etc.)
 
@@ -161,7 +161,7 @@ Compiled using SDCC
 
 Error correction loop via LLM: uses compiler error as feedback
 
-- **Simulation in Proteus
+- Simulation in Proteus
 
 Scripted update of .pdsprj + .dsn files
 
@@ -210,7 +210,7 @@ Code quality is functional but not always optimal
 <a id="Discussion-and-Future-Work"></a>  
 ## Discussion and Future Work
 
-- **Benefits
+- Benefits
 
 Democratizes embedded design
 
@@ -218,7 +218,7 @@ Reduces prototyping time
 
 Enables system-level closed-loop reasoning
 
-- **Limitations
+- Limitations
 
 No multi-objective optimization (e.g. power/cost)
 
@@ -226,7 +226,7 @@ Limited by KB coverage
 
 Doesn't handle PCB layout (yet)
 
-- **Future Work
+- Future Work
 
 Add power/cost trade-off objectives
 
