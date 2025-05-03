@@ -1,0 +1,49 @@
+{
+  "success": true,
+  "timestamp": "2023-10-31T12:30:32.123Z",
+  "signals": {
+    "LM35_1.Vout": {
+      "node": "NODE1",
+      "component": "LM35_1",
+      "pin": "Vout",
+      "values": [0.25, 0.252, 0.254, 0.256, 0.258, 0.26, 0.262, 0.264, 0.266, 0.268]
+    },
+    "LED1.Anode": {
+      "node": "NODE2",
+      "component": "LED1",
+      "pin": "Anode",
+      "values": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "M1.Terminal1": {
+      "node": "NODE3",
+      "component": "M1",
+      "pin": "Terminal1",
+      "values": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "ADC1.D0": {
+      "node": "NODE4",
+      "component": "ADC1",
+      "pin": "D0",
+      "values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    },
+    "ADC1.D1": {
+      "node": "NODE5",
+      "component": "ADC1",
+      "pin": "D1",
+      "values": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    }
+  },
+  "logic_analyzer": {
+    "channel_0": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "channel_1": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "channel_2": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "channel_3": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  },
+  "uart_output": "Temperature Monitoring System\r\nTemp: 25.0 C\r\nTemp: 25.2 C\r\nTemp: 25.4 C\r\nTemp: 25.6 C\r\nTemp: 25.8 C\r\nTemp: 26.0 C\r\nTemp: 26.2 C\r\nTemp: 26.4 C\r\nTemp: 26.6 C\r\nTemp: 26.8 C\r\n",
+  "notes": [
+    "Simulation ran for 10 seconds",
+    "Temperature below 30°C threshold, LED and fan remain off",
+    "ADC working properly",
+    "UART communication successful"
+  ]
+} 

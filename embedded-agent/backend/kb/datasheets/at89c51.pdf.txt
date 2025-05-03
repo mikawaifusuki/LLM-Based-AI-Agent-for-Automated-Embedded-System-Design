@@ -1,0 +1,59 @@
+AT89C51 8-bit Microcontroller with 4K Bytes Flash
+
+General Description:
+The AT89C51 is a low-power, high-performance CMOS 8-bit microcomputer with 4K bytes of Flash programmable and erasable read-only memory (PEROM). The device is manufactured using Atmel's high-density nonvolatile memory technology and is compatible with the industry-standard MCS-51 instruction set and pinout.
+
+Features:
+- Compatible with MCS-51 Products
+- 4K Bytes of In-System Reprogrammable Flash Memory
+- Fully Static Operation: 0 Hz to 24 MHz
+- Three-level Program Memory Lock
+- 128 x 8-bit Internal RAM
+- 32 Programmable I/O Lines
+- Two 16-bit Timer/Counters
+- Six Interrupt Sources
+- Programmable Serial Channel
+- Low-power Idle and Power-down Modes
+
+Pin Configuration:
+- Port 0 (P0.0-P0.7): Pins 32-39 - Dual-purpose I/O port and external memory bus
+- Port 1 (P1.0-P1.7): Pins 1-8 - Input/output port
+- Port 2 (P2.0-P2.7): Pins 21-28 - Dual-purpose I/O port and external memory bus
+- Port 3 (P3.0-P3.7): Pins 10-17 - Multi-function I/O port
+  - P3.0 (RXD): Serial input port
+  - P3.1 (TXD): Serial output port
+  - P3.2 (INT0): External interrupt 0
+  - P3.3 (INT1): External interrupt 1
+  - P3.4 (T0): Timer 0 external input
+  - P3.5 (T1): Timer 1 external input
+  - P3.6 (WR): External data memory write strobe
+  - P3.7 (RD): External data memory read strobe
+- RST: Pin 9 - Reset input
+- ALE: Pin 30 - Address Latch Enable
+- PSEN: Pin 29 - Program Store Enable
+- EA: Pin 31 - External Access Enable
+- XTAL1: Pin 19 - Crystal input
+- XTAL2: Pin 18 - Crystal output
+- VCC: Pin 40 - Power supply (+5V)
+- GND: Pin 20 - Ground (0V)
+
+Clock and Timing:
+The AT89C51 can operate with a clock frequency from 0 to 24 MHz. The standard crystal frequency is 11.0592 MHz for serial communication with standard baud rates.
+
+Programming:
+The Flash memory can be reprogrammed in-system or by conventional nonvolatile memory programmers. Program memory can be locked for security.
+
+Power Management:
+The AT89C51 has two software-selectable power saving modes:
+- Idle Mode: CPU stops working while peripherals continue to function
+- Power-down Mode: Saves RAM contents but freezes the oscillator
+
+Common Applications:
+- Industrial control systems
+- Consumer electronics
+- Automotive systems
+- Smart appliances
+- Educational systems
+
+Crystal Connection:
+To operate the AT89C51 with a crystal, connect a crystal oscillator between XTAL1 and XTAL2, and two capacitors (typically 22pF) from each crystal pin to ground. 

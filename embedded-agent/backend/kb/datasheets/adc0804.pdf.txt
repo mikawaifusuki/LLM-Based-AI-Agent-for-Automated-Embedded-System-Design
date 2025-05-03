@@ -1,0 +1,61 @@
+ADC0804 8-Bit Analog-to-Digital Converter
+
+General Description:
+The ADC0804 is a CMOS 8-bit successive approximation A/D converter that uses a differential potentiometric ladder, similar to the 256R products. It is designed to operate with the 8080A control bus via three-state outputs. The 8-bit A/D converter features a differential analog voltage input and an industry standard 8080A compatible control bus interface for easy connection to microprocessors.
+
+Features:
+- Compatible with 8080 μP derivatives
+- Easy interface to all microprocessors
+- Differential analog voltage inputs
+- Logic inputs and outputs meet both MOS and TTL voltage level specifications
+- Works with 2.5V (LM336) voltage reference
+- On-chip clock generator
+- 0V to 5V analog input voltage range with single 5V supply
+- No zero adjust required
+- 0.3" standard width 20-pin DIP package
+- 20-pin molded chip carrier package
+- Operates ratio-metrically or with 5 VDC, 2.5 VDC, or analog span adjusted voltage reference
+
+Pin Configuration:
+1. CS: Chip Select (active low)
+2. RD: Read (active low)
+3. WR: Write (active low)
+4. CLK IN: External Clock Input
+5. INTR: Interrupt Request (active low)
+6. Vin(+): Positive Analog Input
+7. Vin(-): Negative Analog Input
+8. AGND: Analog Ground
+9. Vref/2: Reference Voltage (half of desired voltage span)
+10. DGND: Digital Ground
+11. D7: Data Bit 7 (MSB)
+12. D6: Data Bit 6
+13. D5: Data Bit 5
+14. D4: Data Bit 4
+15. D3: Data Bit 3
+16. D2: Data Bit 2
+17. D1: Data Bit 1
+18. D0: Data Bit 0 (LSB)
+19. CLK R: Clock Reset
+20. VCC: Power Supply (+5V)
+
+Functional Description:
+The ADC0804 contains an 8-bit A/D converter, 8-bit latch, and 3-state output buffer. The converter is designed to give accurate conversions to 8 bits with no missing codes. A conversion is initiated by pulling the CS and WR inputs low. The end of a conversion is indicated when the INTR output goes low. The microprocessor can read the conversion result by enabling the 3-state outputs through the CS and RD pins.
+
+Connection to 8051 Microcontroller:
+When interfacing with an 8051 microcontroller, the ADC0804 can be connected as follows:
+- CS pin: Connected to a control pin on the 8051 (e.g., P2.0)
+- RD pin: Connected to a control pin on the 8051 (e.g., P2.1)
+- WR pin: Connected to a control pin on the 8051 (e.g., P2.2)
+- INTR pin: Can be connected to an external interrupt pin on the 8051
+- D0-D7: Can be connected to an 8-bit port on the 8051 (e.g., P1.0-P1.7)
+
+For LM35 Temperature Sensor:
+When using the ADC0804 with an LM35 temperature sensor, the LM35's output (which provides 10mV/°C) can be connected to the Vin(+) input, while Vin(-) is tied to ground. For better precision:
+- Vref/2 can be used to adjust the voltage span
+- For 0-100°C range with LM35, the 1V range would map to the full 8-bit range (255 counts)
+
+Conversion Formula:
+Digital Output = (Vin / Vref) × 255
+
+Example: With LM35 at 25°C producing 250mV and using 5V reference:
+Digital Output = (0.25V / 5V) × 255 = 12.75 ≈ 13 (decimal) 

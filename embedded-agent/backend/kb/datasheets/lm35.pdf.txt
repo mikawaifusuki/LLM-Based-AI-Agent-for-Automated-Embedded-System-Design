@@ -1,0 +1,40 @@
+LM35 Precision Centigrade Temperature Sensor
+
+General Description:
+The LM35 series are precision integrated-circuit temperature sensors, whose output voltage is linearly proportional to the Celsius (Centigrade) temperature. The LM35 thus has an advantage over linear temperature sensors calibrated in Kelvin, as the user is not required to subtract a large constant voltage from its output to obtain convenient Centigrade scaling.
+
+Features:
+- Calibrated directly in Celsius (Centigrade)
+- Linear + 10-mV/°C scale factor
+- 0.5°C accuracy (at +25°C)
+- Rated for full −55°C to +150°C range
+- Suitable for remote applications
+- Low-cost due to wafer-level trimming
+- Operates from 4V to 30V
+- Less than 60-μA current drain
+- Low self-heating, 0.08°C in still air
+- Non-linearity only ±1⁄4°C typical
+- Low-impedance output, 0.1Ω for 1-mA load
+
+Pin Configuration:
+1. Vcc (Supply Voltage): 4V to 30V
+2. Vout (Output Voltage): 10mV/°C
+3. GND (Ground)
+
+Basic Centigrade Temperature Sensor:
+The LM35 can be connected easily in the same way as other integrated-circuit temperature sensors. It can be glued or cemented to a surface and its temperature will be within about 0.01°C of the surface temperature.
+
+Temperature to Voltage Conversion:
+Output Voltage = 10mV/°C × Temperature (°C)
+Example: At 25°C, the output voltage is 250mV.
+
+Applications:
+- HVAC systems
+- Temperature monitoring in buildings and machinery
+- Fire detection systems
+- Power system monitors
+- Battery management systems
+- Computer thermal monitoring
+
+Connection to 8051 Microcontroller:
+When connecting to an 8051 microcontroller, the output of the LM35 (Vout) should be connected to an ADC (such as ADC0804) to convert the analog voltage to digital values that the 8051 can process. For example, with a 10mV/°C output and a 5V reference ADC, a reading of 30°C would produce an output voltage of 300mV. 
