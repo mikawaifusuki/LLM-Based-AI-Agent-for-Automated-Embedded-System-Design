@@ -171,6 +171,9 @@ Tasks
 | T4      | Motor PWM + Display  | High       |
 | T5      | Sensor + RF Comm     | Very High  |
 
+![image](https://github.com/user-attachments/assets/c3b1c9a8-bdf1-4a4c-b464-fcf0ff872a32)
+
+
 Results Summary
 
 | Metric                | Human Avg | Agent Avg                   |
@@ -180,6 +183,7 @@ Results Summary
 | Simulation Iterations | \~2.0     | 1.5                         |
 | Success Rate          | 100%      | 100% (with 1 clarification) |
 
+![image](https://github.com/user-attachments/assets/d4047799-6283-4fc9-9f53-f43a6ef888ab)
 
 
 
