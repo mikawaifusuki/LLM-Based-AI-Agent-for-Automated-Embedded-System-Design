@@ -170,7 +170,7 @@ Tasks
 | T4      | Motor PWM + Display  | High       |
 | T5      | Sensor + RF Comm     | Very High  |
 
-## Results Summary
+Results Summary
 
 | Metric                | Human Avg | Agent Avg                   |
 | --------------------- | --------- | --------------------------- |
