@@ -160,6 +160,8 @@ Agent checks logic analyzer / terminal logs to verify behavior
 
 📊 Experimental Results
 
+# Tasks
+
 | Task ID | Description          | Complexity |
 | ------- | -------------------- | ---------- |
 | T1      | LED Blink            | Low        |
@@ -167,6 +169,8 @@ Agent checks logic analyzer / terminal logs to verify behavior
 | T3      | Keypad + LCD         | Medium     |
 | T4      | Motor PWM + Display  | High       |
 | T5      | Sensor + RF Comm     | Very High  |
+
+# Results Summary
 
 | Metric                | Human Avg | Agent Avg                   |
 | --------------------- | --------- | --------------------------- |
