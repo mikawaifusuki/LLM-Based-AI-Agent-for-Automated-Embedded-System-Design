@@ -30,7 +30,36 @@ class KnowledgeBaseTool(BaseTool):
             kb_path: Path to the knowledge base JSONL file.
         """
         super().__init__()
+        
+        # 使用绝对路径
+        if not os.path.isabs(kb_path):
+            # 获取当前文件的目录
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            # 计算项目根目录（减去 /agent/tools 部分）
+            project_root = os.path.abspath(os.path.join(current_dir, '../../..'))
+            # 构建绝对路径
+            kb_path = os.path.join(project_root, kb_path)
+        
         self.kb_path = kb_path
+        print(f"Using knowledge base path: {self.kb_path}")
+        
+        # 检查文件是否存在，如果不存在，尝试其他可能的路径
+        if not os.path.exists(self.kb_path):
+            alternate_path = os.path.join(os.path.dirname(self.kb_path), "backend/kb/components.jsonl")
+            if os.path.exists(alternate_path):
+                self.kb_path = alternate_path
+                print(f"Using alternate knowledge base path: {self.kb_path}")
+            else:
+                print(f"WARNING: Knowledge base file not found at {self.kb_path}")
+                print(f"Also checked alternate path: {alternate_path}")
+                print(f"Current working directory: {os.getcwd()}")
+                # 尝试在当前工作目录及其子目录中查找文件
+                for root, dirs, files in os.walk(os.getcwd()):
+                    if "components.jsonl" in files:
+                        self.kb_path = os.path.join(root, "components.jsonl")
+                        print(f"Found components.jsonl at: {self.kb_path}")
+                        break
+        
         self._load_components()
         self._initialize_vector_store()
     

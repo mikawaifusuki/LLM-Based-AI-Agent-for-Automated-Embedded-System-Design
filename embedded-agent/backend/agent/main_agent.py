@@ -5,6 +5,7 @@ Main agent for the 8051 embedded system design automation.
 import json
 import os
 from typing import Dict, List, Any, Optional
+import traceback
 
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.chains.conversation.memory import ConversationBufferMemory
@@ -90,15 +91,19 @@ Your task is to design a complete system that includes circuit design, 8051 C co
 
 Requirements: {user_request}
 
-Follow a step-by-step process to design the system:
+You have access to the following tools:
+{tools}
 
-Step 1: Analyze the requirements and determine which components are needed.
-Step 2: Query the knowledge base to get details about each component.
-Step 3: Design the circuit connections (netlist).
-Step 4: Write 8051 C code that implements the required functionality.
-Step 5: Compile the code using the SDCC compiler.
-Step 6: Simulate the design in Proteus and analyze the results.
-Step 7: If there are any issues, fix them and try again.
+Tool names: {tool_names}
+
+Follow these steps to complete your task:
+1. Analyze the requirements and determine which components are needed.
+2. Query the knowledge base to get details about each component.
+3. Design the circuit connections (netlist).
+4. Write 8051 C code that implements the required functionality.
+5. Compile the code using the SDCC compiler.
+6. Simulate the design in Proteus and analyze the results.
+7. If there are any issues, fix them and try again.
 
 At each step, provide your reasoning and explain what you're doing.
 
@@ -132,19 +137,27 @@ Let's approach this design task step by step, making sure to explain my reasonin
             Dictionary with the agent's response and any generated artifacts.
         """
         try:
-            # Execute the agent
-            response = self.agent_executor.run(user_request=user_request)
+            # Execute the agent - use invoke instead of run
+            response = self.agent_executor.invoke({"user_request": user_request})
+            
+            # Get the response from the output
+            if isinstance(response, dict) and "output" in response:
+                agent_response = response["output"]
+            else:
+                agent_response = str(response)
             
             # Gather artifacts
             artifacts = self._collect_artifacts()
             
             return {
                 "success": True,
-                "response": response,
+                "response": agent_response,
                 "artifacts": artifacts
             }
         
         except Exception as e:
+            print(f"Agent execution error: {str(e)}")
+            print(traceback.format_exc())
             return {
                 "success": False,
                 "error": str(e)
