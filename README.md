@@ -160,75 +160,24 @@ Agent checks logic analyzer / terminal logs to verify behavior
 
 📊 Experimental Results
 
-🧪 Tasks:
+| Task ID | Description          | Complexity |
+| ------- | -------------------- | ---------- |
+| T1      | LED Blink            | Low        |
+| T2      | Temp Monitor + Alarm | Medium     |
+| T3      | Keypad + LCD         | Medium     |
+| T4      | Motor PWM + Display  | High       |
+| T5      | Sensor + RF Comm     | Very High  |
 
-Task ID
+| Metric                | Human Avg | Agent Avg                   |
+| --------------------- | --------- | --------------------------- |
+| Design Time (mins)    | 60–120    | 20–60                       |
+| Compile Attempts      | 1.1       | 1.2                         |
+| Simulation Iterations | \~2.0     | 1.5                         |
+| Success Rate          | 100%      | 100% (with 1 clarification) |
 
-Description
 
-Complexity
 
-T1
 
-LED Blink
-
-Low
-
-T2
-
-Temp Monitor + Alarm
-
-Medium
-
-T3
-
-Keypad + LCD
-
-Medium
-
-T4
-
-Motor PWM + Display
-
-High
-
-T5
-
-Sensor + RF Comm
-
-Very High
-
-📈 Results Summary
-
-Metric
-
-Human Avg
-
-Agent Avg
-
-Design Time (mins)
-
-60–120
-
-20–60
-
-Compile Attempts
-
-1.1
-
-1.2
-
-Simulation Iterations
-
-~2.0
-
-1.5
-
-Success Rate
-
-100%
-
-100% (with 1 clarification)
 
 ✅ Observations
 
