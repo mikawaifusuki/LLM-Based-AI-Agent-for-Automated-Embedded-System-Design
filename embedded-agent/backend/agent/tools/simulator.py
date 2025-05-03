@@ -5,13 +5,13 @@ import time
 from typing import Dict, List, Optional, Any, Union
 import shutil
 
-from langchain.tools import BaseTool
+from langchain.tools.base import BaseTool
 
 class SimulatorTool(BaseTool):
     """Tool for simulating 8051 circuits using Proteus."""
     
-    name = "SimulatorTool"
-    description = """
+    name: str = "SimulatorTool"
+    description: str = """
     Use this tool to simulate a circuit design in Proteus.
     Input should be a JSON object with circuit netlist and firmware hex path.
     Returns simulation results including voltages, logic analyzer data, or UART output.

@@ -4,13 +4,13 @@ import tempfile
 from typing import Dict, Optional, List, Union
 import json
 
-from langchain.tools import BaseTool
+from langchain.tools.base import BaseTool
 
 class CompilerTool(BaseTool):
     """Tool for compiling 8051 C code into HEX files using SDCC."""
     
-    name = "CompilerTool"
-    description = """
+    name: str = "CompilerTool"
+    description: str = """
     Use this tool to compile 8051 C code into a HEX file.
     Input should be the C code as a string.
     Returns compilation result and path to the HEX file if successful.

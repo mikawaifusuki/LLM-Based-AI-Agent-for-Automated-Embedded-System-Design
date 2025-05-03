@@ -4,23 +4,24 @@ from typing import Dict, List, Optional, Any
 
 import faiss
 import numpy as np
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.tools import BaseTool
-from langchain.vectorstores import FAISS
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain.tools.base import BaseTool
+from langchain_community.vectorstores import FAISS
 from langchain.schema import Document
 
 class KnowledgeBaseTool(BaseTool):
     """Tool for retrieving component information from the knowledge base."""
     
-    name = "KnowledgeBaseTool"
-    description = """
+    name: str = "KnowledgeBaseTool"
+    description: str = """
     Use this tool to retrieve information about electronic components.
     Input should be a query string describing the component or its function.
     Returns structured information about matching components.
     """
     
-    knowledge_base: FAISS = None
+    knowledge_base: Optional[FAISS] = None
     components_data: List[Dict[str, Any]] = []
+    kb_path: str = "backend/kb/components.jsonl"
     
     def __init__(self, kb_path: str = "backend/kb/components.jsonl"):
         """Initialize the knowledge base tool.

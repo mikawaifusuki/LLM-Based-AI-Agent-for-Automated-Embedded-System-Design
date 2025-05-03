@@ -10,13 +10,13 @@ from langchain.agents import AgentExecutor, create_react_agent
 from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from langchain.schema import AgentAction, AgentFinish
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 from langchain.tools.base import BaseTool
 
 # Import custom tools
-from tools.knowledge_base import KnowledgeBaseTool
-from tools.compiler import CompilerTool 
-from tools.simulator import SimulatorTool
+from .tools.knowledge_base import KnowledgeBaseTool
+from .tools.compiler import CompilerTool 
+from .tools.simulator import SimulatorTool
 
 
 class EmbeddedDesignAgent:
