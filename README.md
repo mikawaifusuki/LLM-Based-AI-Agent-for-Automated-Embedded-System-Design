@@ -73,16 +73,27 @@ First to combine hardware schematic, firmware code, and closed-loop simulation i
 Overview
 
 graph TD
+
     A[User Spec (Natural Language)] --> B[LLM Agent via LangChain]
+    
     B --> C[Component Knowledge Base (RAG)]
+    
     B --> D[Circuit Schematic Generator (Rules)]
+    
     B --> E[Firmware Generator (C Code)]
+    
     E --> F[SDCC Compiler]
+    
     F --> G[Hex Firmware File]
+    
     D --> H[Proteus Simulation Setup]
+    
     G --> H
+    
     H --> I[Simulation Verification]
+    
     I -->|Pass| J[Final Design Output]
+    
     I -->|Fail| B
 
 Steps
