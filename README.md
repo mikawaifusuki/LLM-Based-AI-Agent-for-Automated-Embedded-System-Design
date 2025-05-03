@@ -127,47 +127,47 @@ Loop Until Specification Satisfied
 
 -**LLM Agent via LangChain**
 
-    Uses ReAct-style prompting
+  Uses ReAct-style prompting
 
-    Tools used:
+  Tools used:
 
-    KnowledgeBaseTool
+  KnowledgeBaseTool
 
-    CompilerTool
+  CompilerTool
 
-    SimulatorTool
+  SimulatorTool
 
 -**Component Knowledge Base (RAG)**
 
-    JSON entries + text from datasheets
+  JSON entries + text from datasheets
 
-    Indexed with FAISS vector database
+  Indexed with FAISS vector database
 
-    Reduces hallucination, ensures factual wiring/code
+  Reduces hallucination, ensures factual wiring/code
 
 -**Rule-Based Schematic Generator**
 
-    Inserts resistors, capacitors, pull-ups, etc.
+  Inserts resistors, capacitors, pull-ups, etc.
 
-    Ensures electrical correctness
+  Ensures electrical correctness
 
-    Converts netlist into Proteus design file
+  Converts netlist into Proteus design file
 
 -**Code Generation + Compilation**
 
-    C code for 8051 (reg51.h, loops, ADC logic, etc.)
+  C code for 8051 (reg51.h, loops, ADC logic, etc.)
 
-    Compiled using SDCC
+  Compiled using SDCC
 
-    Error correction loop via LLM: uses compiler error as feedback
+  Error correction loop via LLM: uses compiler error as feedback
 
 -**Simulation in Proteus**
 
-    Scripted update of .pdsprj + .dsn files
+  Scripted update of .pdsprj + .dsn files
 
-    Virtual instruments for output checking (e.g., LED voltage, UART)
+  Virtual instruments for output checking (e.g., LED voltage, UART)
 
-    Agent checks logic analyzer / terminal logs to verify behavior
+  Agent checks logic analyzer / terminal logs to verify behavior
 
 <a id="Experimental-Results"></a>  
 ## Experimental Results
