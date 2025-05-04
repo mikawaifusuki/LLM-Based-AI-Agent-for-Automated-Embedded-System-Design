@@ -1,0 +1,136 @@
+======================================================================================================================================================
+
+🔁 状态机步骤：
+步骤编号	模块/工具	功能描述
+S1	CodeGeneratorAgent	根据用户输入生成初版 C 代码
+S2	CodeReviewTool	审查 C 代码格式、风格、安全性和平台适配
+S3	ControllerAgent	判断是否需要重写代码（根据 review 严重等级）
+S4	CodeModifierAgent	根据审查意见修改代码
+S5	CodeReviewTool（复审）	审查修改后的代码
+S6	ControllerAgent	如果仍有严重问题 → 回到 S4；否则进入编译
+S7	CompilerTool	编译为 .hex
+S8	SimulatorTool	执行仿真并分析结果
+
+
+【【【【【【【langchain控制逻辑】】】】】】
+
+def embedded_agent_pipeline(user_input):
+    # Step 1: 初始代码生成
+    code = CodeGeneratorAgent.run(user_input)
+
+    while True:
+        # Step 2: 审查当前代码
+        review = CodeReviewTool.run(code)
+        
+        # Step 3: 判断是否需要修改
+        if contains_severe_issues(review):
+            # Step 4: 基于审查结果修正代码
+            code = CodeModifierAgent.run(code, review)
+            continue  # 回到 Step 2 进行复审
+        else:
+            break  # 若无严重问题，跳出循环
+    
+    # Step 5: 编译
+    hex_file = CompilerTool.run(code)
+    if hex_file.failed:
+        raise Exception("Compilation failed after review. Check formatting or retry CodeModifierAgent.")
+
+    # Step 6: 仿真
+    result = SimulatorTool.run(hex_file)
+    return result
+
+
+
+模块说明：
+Agent/Tool	说明
+CodeGeneratorAgent	使用 GPT-4 之类模型生成 C 程序代码（带注释）
+CodeReviewTool	调用 OpenAI Embedding + FAISS + LangChain RetrievalQA 审查代码
+CodeModifierAgent	提取 CodeReview 的“严重问题”并修正对应代码段
+ControllerAgent	判断是否进入下一个阶段，或重回 Code 修正
+CompilerTool	使用 SDCC 编译器编译成 HEX
+SimulatorTool	使用 Proteus 等执行仿真
+clean_code_for_sdcc	清理掉注释文本、非法首行等，确保格式合法（非常关键）
+
+======================================================================================================================================================
+
+
+建议加入状态记录字段
+state = {
+    "code_version": 1,
+    "last_review_passed": False,
+    "last_review_feedback": "",
+    "compiler_success": None,
+    "simulation_result": None,
+}
+
+
+
+将每次审查得到的错误内容自动加入到 RAG 知识库中，这样 RAG 会随着你项目运行不断“进化”——变得更智能、更有针对性。
+
+加入方式建议（自动采集 + 增量更新）
+🧩 每次审查后提取结构化错误：
+比如已有这类输出：
+{
+  "type": "critical",
+  "line": 4,
+  "code": "#include <stdio.h>",
+  "issue": "8051 不支持标准库",
+  "suggestion": "删除该头文件，改用平台特定实现。"
+}
+你可以提取成知识文本：
+{
+  "text": "8051 微控制器不支持 <stdio.h> 等标准 C 库，应使用平台特定头文件或替代函数。",
+  "source": "auto-review",
+  "tags": ["platform", "8051", "stdio"]
+}
+技术流程建议
+
+结构化提取审查结果：
+用正则 / JSONSchema 提取文本中的建议内容。
+
+过滤重复内容：
+用 embedding（OpenAI 或 SentenceTransformers）做近似去重。
+
+增量写入 JSONL 文件：
+附加到 code_review_knowledge.jsonl 中。
+
+定期重建 FAISS 索引：
+# 重新索引（可每N次或每日执行）
+texts = load_jsonl("code_review_knowledge.jsonl")
+vectorstore = FAISS.from_texts(texts, embedding=OpenAIEmbeddings())
+vectorstore.save_local("code_review_8051_index")
+
+
+效果
+🚀 智能体逐步“学习”你常见的嵌入式开发错误
+🔁 每次运行都变得更强大
+🧠 长期能形成你的私有代码审查知识体系
+
+
+示例：
+已成功将代码审查中的错误内容加入到 RAG 知识库（JSONL 文件）中，示例如下：
+{
+  "id": "6e577656-c390-4946-aebe-27d5731b9b8b",
+  "text": "8051 微控制器不支持 <stdio.h> 等标准 C 库，应使用平台特定头文件或替代函数。",
+  "source": "code-review",
+  "tags": ["8051", "stdio", "platform"]
+}
+现在可以：
+
+定期将所有 code reviewer 输出自动追加到该 JSONL 文件；
+结合 OpenAI Embeddings 和 FAISS 或 Chroma 构建向量数据库；
+用作 LangChain 的 VectorStoreRetriever 支持代码审查前的知识增强。
+
+
+code reviewer agent改进：：：：：：：：
+改进提示词：
+在 CodeReviewTool 的 prompt 前加一句系统级指令：
+"在开始审查前，先从历史错误数据库（RAG）中检索相似错误作为参考，然后再给出审查结果。"
+
+LangChain 结构建议：
+RetrievalQA.from_chain_type(
+    llm=OpenAI(...),
+    retriever=faiss_retriever,
+    chain_type="stuff",
+    chain_type_kwargs={"prompt": code_review_prompt_with_context}
+)
