@@ -1,0 +1,652 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler
+                                      3 ; Version 4.5.0 #15242 (Mac OS X ppc)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module firmware_1746319894
+                                      6 	
+                                      7 	.optsdcc -mmcs51 --model-small
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _main
+                                     12 	.globl _sprintf
+                                     13 	.globl _CY
+                                     14 	.globl _AC
+                                     15 	.globl _F0
+                                     16 	.globl _RS1
+                                     17 	.globl _RS0
+                                     18 	.globl _OV
+                                     19 	.globl _F1
+                                     20 	.globl _P
+                                     21 	.globl _PS
+                                     22 	.globl _PT1
+                                     23 	.globl _PX1
+                                     24 	.globl _PT0
+                                     25 	.globl _PX0
+                                     26 	.globl _RD
+                                     27 	.globl _WR
+                                     28 	.globl _T1
+                                     29 	.globl _T0
+                                     30 	.globl _INT1
+                                     31 	.globl _INT0
+                                     32 	.globl _TXD
+                                     33 	.globl _RXD
+                                     34 	.globl _P3_7
+                                     35 	.globl _P3_6
+                                     36 	.globl _P3_5
+                                     37 	.globl _P3_4
+                                     38 	.globl _P3_3
+                                     39 	.globl _P3_2
+                                     40 	.globl _P3_1
+                                     41 	.globl _P3_0
+                                     42 	.globl _EA
+                                     43 	.globl _ES
+                                     44 	.globl _ET1
+                                     45 	.globl _EX1
+                                     46 	.globl _ET0
+                                     47 	.globl _EX0
+                                     48 	.globl _P2_7
+                                     49 	.globl _P2_6
+                                     50 	.globl _P2_5
+                                     51 	.globl _P2_4
+                                     52 	.globl _P2_3
+                                     53 	.globl _P2_2
+                                     54 	.globl _P2_1
+                                     55 	.globl _P2_0
+                                     56 	.globl _SM0
+                                     57 	.globl _SM1
+                                     58 	.globl _SM2
+                                     59 	.globl _REN
+                                     60 	.globl _TB8
+                                     61 	.globl _RB8
+                                     62 	.globl _TI
+                                     63 	.globl _RI
+                                     64 	.globl _P1_7
+                                     65 	.globl _P1_6
+                                     66 	.globl _P1_5
+                                     67 	.globl _P1_4
+                                     68 	.globl _P1_3
+                                     69 	.globl _P1_2
+                                     70 	.globl _P1_1
+                                     71 	.globl _P1_0
+                                     72 	.globl _TF1
+                                     73 	.globl _TR1
+                                     74 	.globl _TF0
+                                     75 	.globl _TR0
+                                     76 	.globl _IE1
+                                     77 	.globl _IT1
+                                     78 	.globl _IE0
+                                     79 	.globl _IT0
+                                     80 	.globl _P0_7
+                                     81 	.globl _P0_6
+                                     82 	.globl _P0_5
+                                     83 	.globl _P0_4
+                                     84 	.globl _P0_3
+                                     85 	.globl _P0_2
+                                     86 	.globl _P0_1
+                                     87 	.globl _P0_0
+                                     88 	.globl _B
+                                     89 	.globl _ACC
+                                     90 	.globl _PSW
+                                     91 	.globl _IP
+                                     92 	.globl _P3
+                                     93 	.globl _IE
+                                     94 	.globl _P2
+                                     95 	.globl _SBUF
+                                     96 	.globl _SCON
+                                     97 	.globl _P1
+                                     98 	.globl _TH1
+                                     99 	.globl _TH0
+                                    100 	.globl _TL1
+                                    101 	.globl _TL0
+                                    102 	.globl _TMOD
+                                    103 	.globl _TCON
+                                    104 	.globl _PCON
+                                    105 	.globl _DPH
+                                    106 	.globl _DPL
+                                    107 	.globl _SP
+                                    108 	.globl _P0
+                                    109 	.globl _init_system
+                                    110 	.globl _delay_ms
+                                    111 	.globl _read_adc
+                                    112 	.globl _read_temperature
+                                    113 	.globl _init_uart
+                                    114 	.globl _uart_tx_char
+                                    115 	.globl _uart_tx_string
+                                    116 ;--------------------------------------------------------
+                                    117 ; special function registers
+                                    118 ;--------------------------------------------------------
+                                    119 	.area RSEG    (ABS,DATA)
+      000000                        120 	.org 0x0000
+                           000080   121 _P0	=	0x0080
+                           000081   122 _SP	=	0x0081
+                           000082   123 _DPL	=	0x0082
+                           000083   124 _DPH	=	0x0083
+                           000087   125 _PCON	=	0x0087
+                           000088   126 _TCON	=	0x0088
+                           000089   127 _TMOD	=	0x0089
+                           00008A   128 _TL0	=	0x008a
+                           00008B   129 _TL1	=	0x008b
+                           00008C   130 _TH0	=	0x008c
+                           00008D   131 _TH1	=	0x008d
+                           000090   132 _P1	=	0x0090
+                           000098   133 _SCON	=	0x0098
+                           000099   134 _SBUF	=	0x0099
+                           0000A0   135 _P2	=	0x00a0
+                           0000A8   136 _IE	=	0x00a8
+                           0000B0   137 _P3	=	0x00b0
+                           0000B8   138 _IP	=	0x00b8
+                           0000D0   139 _PSW	=	0x00d0
+                           0000E0   140 _ACC	=	0x00e0
+                           0000F0   141 _B	=	0x00f0
+                                    142 ;--------------------------------------------------------
+                                    143 ; special function bits
+                                    144 ;--------------------------------------------------------
+                                    145 	.area RSEG    (ABS,DATA)
+      000000                        146 	.org 0x0000
+                           000080   147 _P0_0	=	0x0080
+                           000081   148 _P0_1	=	0x0081
+                           000082   149 _P0_2	=	0x0082
+                           000083   150 _P0_3	=	0x0083
+                           000084   151 _P0_4	=	0x0084
+                           000085   152 _P0_5	=	0x0085
+                           000086   153 _P0_6	=	0x0086
+                           000087   154 _P0_7	=	0x0087
+                           000088   155 _IT0	=	0x0088
+                           000089   156 _IE0	=	0x0089
+                           00008A   157 _IT1	=	0x008a
+                           00008B   158 _IE1	=	0x008b
+                           00008C   159 _TR0	=	0x008c
+                           00008D   160 _TF0	=	0x008d
+                           00008E   161 _TR1	=	0x008e
+                           00008F   162 _TF1	=	0x008f
+                           000090   163 _P1_0	=	0x0090
+                           000091   164 _P1_1	=	0x0091
+                           000092   165 _P1_2	=	0x0092
+                           000093   166 _P1_3	=	0x0093
+                           000094   167 _P1_4	=	0x0094
+                           000095   168 _P1_5	=	0x0095
+                           000096   169 _P1_6	=	0x0096
+                           000097   170 _P1_7	=	0x0097
+                           000098   171 _RI	=	0x0098
+                           000099   172 _TI	=	0x0099
+                           00009A   173 _RB8	=	0x009a
+                           00009B   174 _TB8	=	0x009b
+                           00009C   175 _REN	=	0x009c
+                           00009D   176 _SM2	=	0x009d
+                           00009E   177 _SM1	=	0x009e
+                           00009F   178 _SM0	=	0x009f
+                           0000A0   179 _P2_0	=	0x00a0
+                           0000A1   180 _P2_1	=	0x00a1
+                           0000A2   181 _P2_2	=	0x00a2
+                           0000A3   182 _P2_3	=	0x00a3
+                           0000A4   183 _P2_4	=	0x00a4
+                           0000A5   184 _P2_5	=	0x00a5
+                           0000A6   185 _P2_6	=	0x00a6
+                           0000A7   186 _P2_7	=	0x00a7
+                           0000A8   187 _EX0	=	0x00a8
+                           0000A9   188 _ET0	=	0x00a9
+                           0000AA   189 _EX1	=	0x00aa
+                           0000AB   190 _ET1	=	0x00ab
+                           0000AC   191 _ES	=	0x00ac
+                           0000AF   192 _EA	=	0x00af
+                           0000B0   193 _P3_0	=	0x00b0
+                           0000B1   194 _P3_1	=	0x00b1
+                           0000B2   195 _P3_2	=	0x00b2
+                           0000B3   196 _P3_3	=	0x00b3
+                           0000B4   197 _P3_4	=	0x00b4
+                           0000B5   198 _P3_5	=	0x00b5
+                           0000B6   199 _P3_6	=	0x00b6
+                           0000B7   200 _P3_7	=	0x00b7
+                           0000B0   201 _RXD	=	0x00b0
+                           0000B1   202 _TXD	=	0x00b1
+                           0000B2   203 _INT0	=	0x00b2
+                           0000B3   204 _INT1	=	0x00b3
+                           0000B4   205 _T0	=	0x00b4
+                           0000B5   206 _T1	=	0x00b5
+                           0000B6   207 _WR	=	0x00b6
+                           0000B7   208 _RD	=	0x00b7
+                           0000B8   209 _PX0	=	0x00b8
+                           0000B9   210 _PT0	=	0x00b9
+                           0000BA   211 _PX1	=	0x00ba
+                           0000BB   212 _PT1	=	0x00bb
+                           0000BC   213 _PS	=	0x00bc
+                           0000D0   214 _P	=	0x00d0
+                           0000D1   215 _F1	=	0x00d1
+                           0000D2   216 _OV	=	0x00d2
+                           0000D3   217 _RS0	=	0x00d3
+                           0000D4   218 _RS1	=	0x00d4
+                           0000D5   219 _F0	=	0x00d5
+                           0000D6   220 _AC	=	0x00d6
+                           0000D7   221 _CY	=	0x00d7
+                                    222 ;--------------------------------------------------------
+                                    223 ; overlayable register banks
+                                    224 ;--------------------------------------------------------
+                                    225 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                        226 	.ds 8
+                                    227 ;--------------------------------------------------------
+                                    228 ; internal ram data
+                                    229 ;--------------------------------------------------------
+                                    230 	.area DSEG    (DATA)
+      000008                        231 _main_temp_str_10001_58:
+      000008                        232 	.ds 16
+                                    233 ;--------------------------------------------------------
+                                    234 ; overlayable items in internal ram
+                                    235 ;--------------------------------------------------------
+                                    236 	.area	OSEG    (OVR,DATA)
+                                    237 	.area	OSEG    (OVR,DATA)
+                                    238 	.area	OSEG    (OVR,DATA)
+                                    239 ;--------------------------------------------------------
+                                    240 ; Stack segment in internal ram
+                                    241 ;--------------------------------------------------------
+                                    242 	.area SSEG
+      000054                        243 __start__stack:
+      000054                        244 	.ds	1
+                                    245 
+                                    246 ;--------------------------------------------------------
+                                    247 ; indirectly addressable internal ram data
+                                    248 ;--------------------------------------------------------
+                                    249 	.area ISEG    (DATA)
+                                    250 ;--------------------------------------------------------
+                                    251 ; absolute internal ram data
+                                    252 ;--------------------------------------------------------
+                                    253 	.area IABS    (ABS,DATA)
+                                    254 	.area IABS    (ABS,DATA)
+                                    255 ;--------------------------------------------------------
+                                    256 ; bit data
+                                    257 ;--------------------------------------------------------
+                                    258 	.area BSEG    (BIT)
+                                    259 ;--------------------------------------------------------
+                                    260 ; paged external ram data
+                                    261 ;--------------------------------------------------------
+                                    262 	.area PSEG    (PAG,XDATA)
+                                    263 ;--------------------------------------------------------
+                                    264 ; uninitialized external ram data
+                                    265 ;--------------------------------------------------------
+                                    266 	.area XSEG    (XDATA)
+                                    267 ;--------------------------------------------------------
+                                    268 ; absolute external ram data
+                                    269 ;--------------------------------------------------------
+                                    270 	.area XABS    (ABS,XDATA)
+                                    271 ;--------------------------------------------------------
+                                    272 ; initialized external ram data
+                                    273 ;--------------------------------------------------------
+                                    274 	.area XISEG   (XDATA)
+                                    275 	.area HOME    (CODE)
+                                    276 	.area GSINIT0 (CODE)
+                                    277 	.area GSINIT1 (CODE)
+                                    278 	.area GSINIT2 (CODE)
+                                    279 	.area GSINIT3 (CODE)
+                                    280 	.area GSINIT4 (CODE)
+                                    281 	.area GSINIT5 (CODE)
+                                    282 	.area GSINIT  (CODE)
+                                    283 	.area GSFINAL (CODE)
+                                    284 	.area CSEG    (CODE)
+                                    285 ;--------------------------------------------------------
+                                    286 ; interrupt vector
+                                    287 ;--------------------------------------------------------
+                                    288 	.area HOME    (CODE)
+      000000                        289 __interrupt_vect:
+      000000 02 00 4C         [24]  290 	ljmp	__sdcc_gsinit_startup
+                                    291 ; restartable atomic support routines
+      000003                        292 	.ds	5
+      000008                        293 sdcc_atomic_exchange_rollback_start::
+      000008 00               [12]  294 	nop
+      000009 00               [12]  295 	nop
+      00000A                        296 sdcc_atomic_exchange_pdata_impl:
+      00000A E2               [24]  297 	movx	a, @r0
+      00000B FB               [12]  298 	mov	r3, a
+      00000C EA               [12]  299 	mov	a, r2
+      00000D F2               [24]  300 	movx	@r0, a
+      00000E 80 2C            [24]  301 	sjmp	sdcc_atomic_exchange_exit
+      000010 00               [12]  302 	nop
+      000011 00               [12]  303 	nop
+      000012                        304 sdcc_atomic_exchange_xdata_impl:
+      000012 E0               [24]  305 	movx	a, @dptr
+      000013 FB               [12]  306 	mov	r3, a
+      000014 EA               [12]  307 	mov	a, r2
+      000015 F0               [24]  308 	movx	@dptr, a
+      000016 80 24            [24]  309 	sjmp	sdcc_atomic_exchange_exit
+      000018                        310 sdcc_atomic_compare_exchange_idata_impl:
+      000018 E6               [12]  311 	mov	a, @r0
+      000019 B5 02 02         [24]  312 	cjne	a, ar2, .+#5
+      00001C EB               [12]  313 	mov	a, r3
+      00001D F6               [12]  314 	mov	@r0, a
+      00001E 22               [24]  315 	ret
+      00001F 00               [12]  316 	nop
+      000020                        317 sdcc_atomic_compare_exchange_pdata_impl:
+      000020 E2               [24]  318 	movx	a, @r0
+      000021 B5 02 02         [24]  319 	cjne	a, ar2, .+#5
+      000024 EB               [12]  320 	mov	a, r3
+      000025 F2               [24]  321 	movx	@r0, a
+      000026 22               [24]  322 	ret
+      000027 00               [12]  323 	nop
+      000028                        324 sdcc_atomic_compare_exchange_xdata_impl:
+      000028 E0               [24]  325 	movx	a, @dptr
+      000029 B5 02 02         [24]  326 	cjne	a, ar2, .+#5
+      00002C EB               [12]  327 	mov	a, r3
+      00002D F0               [24]  328 	movx	@dptr, a
+      00002E 22               [24]  329 	ret
+      00002F                        330 sdcc_atomic_exchange_rollback_end::
+                                    331 
+      00002F                        332 sdcc_atomic_exchange_gptr_impl::
+      00002F 30 F6 E0         [24]  333 	jnb	b.6, sdcc_atomic_exchange_xdata_impl
+      000032 A8 82            [24]  334 	mov	r0, dpl
+      000034 20 F5 D3         [24]  335 	jb	b.5, sdcc_atomic_exchange_pdata_impl
+      000037                        336 sdcc_atomic_exchange_idata_impl:
+      000037 EA               [12]  337 	mov	a, r2
+      000038 C6               [12]  338 	xch	a, @r0
+      000039 F5 82            [12]  339 	mov	dpl, a
+      00003B 22               [24]  340 	ret
+      00003C                        341 sdcc_atomic_exchange_exit:
+      00003C 8B 82            [24]  342 	mov	dpl, r3
+      00003E 22               [24]  343 	ret
+      00003F                        344 sdcc_atomic_compare_exchange_gptr_impl::
+      00003F 30 F6 E6         [24]  345 	jnb	b.6, sdcc_atomic_compare_exchange_xdata_impl
+      000042 A8 82            [24]  346 	mov	r0, dpl
+      000044 20 F5 D9         [24]  347 	jb	b.5, sdcc_atomic_compare_exchange_pdata_impl
+      000047 80 CF            [24]  348 	sjmp	sdcc_atomic_compare_exchange_idata_impl
+                                    349 ;--------------------------------------------------------
+                                    350 ; global & static initialisations
+                                    351 ;--------------------------------------------------------
+                                    352 	.area HOME    (CODE)
+                                    353 	.area GSINIT  (CODE)
+                                    354 	.area GSFINAL (CODE)
+                                    355 	.area GSINIT  (CODE)
+                                    356 	.globl __sdcc_gsinit_startup
+                                    357 	.globl __sdcc_program_startup
+                                    358 	.globl __start__stack
+                                    359 	.globl __mcs51_genXINIT
+                                    360 	.globl __mcs51_genXRAMCLEAR
+                                    361 	.globl __mcs51_genRAMCLEAR
+                                    362 	.area GSFINAL (CODE)
+      0000A5 02 00 49         [24]  363 	ljmp	__sdcc_program_startup
+                                    364 ;--------------------------------------------------------
+                                    365 ; Home
+                                    366 ;--------------------------------------------------------
+                                    367 	.area HOME    (CODE)
+                                    368 	.area HOME    (CODE)
+      000049                        369 __sdcc_program_startup:
+      000049 02 00 A8         [24]  370 	ljmp	_main
+                                    371 ;	return from main will return to caller
+                                    372 ;--------------------------------------------------------
+                                    373 ; code
+                                    374 ;--------------------------------------------------------
+                                    375 	.area CSEG    (CODE)
+                                    376 ;------------------------------------------------------------
+                                    377 ;Allocation info for local variables in function 'main'
+                                    378 ;------------------------------------------------------------
+                                    379 ;temperature   Allocated to registers r4 r5 r6 r7 
+                                    380 ;temp_str      Allocated with name '_main_temp_str_10001_58'
+                                    381 ;------------------------------------------------------------
+                                    382 ;	./backend/backend/outputs/firmware_1746319894.c:27: void main(void) {
+                                    383 ;	-----------------------------------------
+                                    384 ;	 function main
+                                    385 ;	-----------------------------------------
+      0000A8                        386 _main:
+                           000007   387 	ar7 = 0x07
+                           000006   388 	ar6 = 0x06
+                           000005   389 	ar5 = 0x05
+                           000004   390 	ar4 = 0x04
+                           000003   391 	ar3 = 0x03
+                           000002   392 	ar2 = 0x02
+                           000001   393 	ar1 = 0x01
+                           000000   394 	ar0 = 0x00
+                                    395 ;	./backend/backend/outputs/firmware_1746319894.c:29: init_system();
+      0000A8 12 00 FB         [24]  396 	lcall	_init_system
+                                    397 ;	./backend/backend/outputs/firmware_1746319894.c:32: init_uart();
+      0000AB 12 01 5C         [24]  398 	lcall	_init_uart
+                                    399 ;	./backend/backend/outputs/firmware_1746319894.c:35: uart_tx_string("System initialized\r\n");
+      0000AE 90 0B A6         [24]  400 	mov	dptr,#___str_0
+      0000B1 75 F0 80         [24]  401 	mov	b, #0x80
+      0000B4 12 01 76         [24]  402 	lcall	_uart_tx_string
+                                    403 ;	./backend/backend/outputs/firmware_1746319894.c:42: while (1) {
+      0000B7                        404 00102$:
+                                    405 ;	./backend/backend/outputs/firmware_1746319894.c:44: temperature = read_temperature();
+      0000B7 12 01 24         [24]  406 	lcall	_read_temperature
+      0000BA AC 82            [24]  407 	mov	r4, dpl
+      0000BC AD 83            [24]  408 	mov	r5, dph
+      0000BE AE F0            [24]  409 	mov	r6, b
+      0000C0 FF               [12]  410 	mov	r7, a
+                                    411 ;	./backend/backend/outputs/firmware_1746319894.c:47: sprintf(temp_str, "Temp: %.1f C\r\n", temperature);
+      0000C1 C0 04            [24]  412 	push	ar4
+      0000C3 C0 05            [24]  413 	push	ar5
+      0000C5 C0 06            [24]  414 	push	ar6
+      0000C7 C0 07            [24]  415 	push	ar7
+      0000C9 74 BB            [12]  416 	mov	a,#___str_1
+      0000CB C0 E0            [24]  417 	push	acc
+      0000CD 74 0B            [12]  418 	mov	a,#(___str_1 >> 8)
+      0000CF C0 E0            [24]  419 	push	acc
+      0000D1 74 80            [12]  420 	mov	a,#0x80
+      0000D3 C0 E0            [24]  421 	push	acc
+      0000D5 74 08            [12]  422 	mov	a,#_main_temp_str_10001_58
+      0000D7 C0 E0            [24]  423 	push	acc
+      0000D9 74 00            [12]  424 	mov	a,#(_main_temp_str_10001_58 >> 8)
+      0000DB C0 E0            [24]  425 	push	acc
+      0000DD 74 40            [12]  426 	mov	a,#0x40
+      0000DF C0 E0            [24]  427 	push	acc
+      0000E1 12 03 52         [24]  428 	lcall	_sprintf
+      0000E4 E5 81            [12]  429 	mov	a,sp
+      0000E6 24 F6            [12]  430 	add	a,#0xf6
+      0000E8 F5 81            [12]  431 	mov	sp,a
+                                    432 ;	./backend/backend/outputs/firmware_1746319894.c:50: uart_tx_string(temp_str);
+      0000EA 90 00 08         [24]  433 	mov	dptr,#_main_temp_str_10001_58
+      0000ED 75 F0 40         [24]  434 	mov	b, #0x40
+      0000F0 12 01 76         [24]  435 	lcall	_uart_tx_string
+                                    436 ;	./backend/backend/outputs/firmware_1746319894.c:54: delay_ms(1000);  // 1 second delay
+      0000F3 90 03 E8         [24]  437 	mov	dptr,#0x03e8
+      0000F6 12 00 FC         [24]  438 	lcall	_delay_ms
+                                    439 ;	./backend/backend/outputs/firmware_1746319894.c:56: }
+      0000F9 80 BC            [24]  440 	sjmp	00102$
+                                    441 ;------------------------------------------------------------
+                                    442 ;Allocation info for local variables in function 'init_system'
+                                    443 ;------------------------------------------------------------
+                                    444 ;	./backend/backend/outputs/firmware_1746319894.c:61: void init_system(void) {
+                                    445 ;	-----------------------------------------
+                                    446 ;	 function init_system
+                                    447 ;	-----------------------------------------
+      0000FB                        448 _init_system:
+                                    449 ;	./backend/backend/outputs/firmware_1746319894.c:65: }
+      0000FB 22               [24]  450 	ret
+                                    451 ;------------------------------------------------------------
+                                    452 ;Allocation info for local variables in function 'delay_ms'
+                                    453 ;------------------------------------------------------------
+                                    454 ;ms            Allocated to registers r6 r7 
+                                    455 ;i             Allocated to registers r4 r5 
+                                    456 ;j             Allocated to registers r2 r3 
+                                    457 ;------------------------------------------------------------
+                                    458 ;	./backend/backend/outputs/firmware_1746319894.c:70: void delay_ms(unsigned int ms) {
+                                    459 ;	-----------------------------------------
+                                    460 ;	 function delay_ms
+                                    461 ;	-----------------------------------------
+      0000FC                        462 _delay_ms:
+      0000FC AE 82            [24]  463 	mov	r6, dpl
+      0000FE AF 83            [24]  464 	mov	r7, dph
+                                    465 ;	./backend/backend/outputs/firmware_1746319894.c:72: for (i = 0; i < ms; i++) {
+      000100 7C 00            [12]  466 	mov	r4,#0x00
+      000102 7D 00            [12]  467 	mov	r5,#0x00
+      000104                        468 00107$:
+      000104 C3               [12]  469 	clr	c
+      000105 EC               [12]  470 	mov	a,r4
+      000106 9E               [12]  471 	subb	a,r6
+      000107 ED               [12]  472 	mov	a,r5
+      000108 9F               [12]  473 	subb	a,r7
+      000109 50 14            [24]  474 	jnc	00109$
+                                    475 ;	./backend/backend/outputs/firmware_1746319894.c:73: for (j = 0; j < 120; j++) {  // Adjust based on crystal frequency
+      00010B 7A 78            [12]  476 	mov	r2,#0x78
+      00010D 7B 00            [12]  477 	mov	r3,#0x00
+      00010F                        478 00105$:
+      00010F 1A               [12]  479 	dec	r2
+      000110 BA FF 01         [24]  480 	cjne	r2,#0xff,00138$
+      000113 1B               [12]  481 	dec	r3
+      000114                        482 00138$:
+      000114 EA               [12]  483 	mov	a,r2
+      000115 4B               [12]  484 	orl	a,r3
+      000116 70 F7            [24]  485 	jnz	00105$
+                                    486 ;	./backend/backend/outputs/firmware_1746319894.c:72: for (i = 0; i < ms; i++) {
+      000118 0C               [12]  487 	inc	r4
+      000119 BC 00 E8         [24]  488 	cjne	r4,#0x00,00107$
+      00011C 0D               [12]  489 	inc	r5
+      00011D 80 E5            [24]  490 	sjmp	00107$
+      00011F                        491 00109$:
+                                    492 ;	./backend/backend/outputs/firmware_1746319894.c:77: }
+      00011F 22               [24]  493 	ret
+                                    494 ;------------------------------------------------------------
+                                    495 ;Allocation info for local variables in function 'read_adc'
+                                    496 ;------------------------------------------------------------
+                                    497 ;channel       Allocated to registers 
+                                    498 ;------------------------------------------------------------
+                                    499 ;	./backend/backend/outputs/firmware_1746319894.c:82: unsigned int read_adc(unsigned char channel) {
+                                    500 ;	-----------------------------------------
+                                    501 ;	 function read_adc
+                                    502 ;	-----------------------------------------
+      000120                        503 _read_adc:
+                                    504 ;	./backend/backend/outputs/firmware_1746319894.c:86: return 512;  // Return mid-range value
+      000120 90 02 00         [24]  505 	mov	dptr,#0x0200
+                                    506 ;	./backend/backend/outputs/firmware_1746319894.c:87: }
+      000123 22               [24]  507 	ret
+                                    508 ;------------------------------------------------------------
+                                    509 ;Allocation info for local variables in function 'read_temperature'
+                                    510 ;------------------------------------------------------------
+                                    511 ;adc_value     Allocated to registers 
+                                    512 ;temperature   Allocated to registers r4 r5 r6 r7 
+                                    513 ;------------------------------------------------------------
+                                    514 ;	./backend/backend/outputs/firmware_1746319894.c:93: float read_temperature(void) {
+                                    515 ;	-----------------------------------------
+                                    516 ;	 function read_temperature
+                                    517 ;	-----------------------------------------
+      000124                        518 _read_temperature:
+                                    519 ;	./backend/backend/outputs/firmware_1746319894.c:98: adc_value = read_adc(0);
+      000124 75 82 00         [24]  520 	mov	dpl, #0x00
+      000127 12 01 20         [24]  521 	lcall	_read_adc
+                                    522 ;	./backend/backend/outputs/firmware_1746319894.c:103: temperature = (adc_value * 0.488);  // Simplified calculation
+      00012A 12 03 9D         [24]  523 	lcall	___uint2fs
+      00012D AC 82            [24]  524 	mov	r4, dpl
+      00012F AD 83            [24]  525 	mov	r5, dph
+      000131 AE F0            [24]  526 	mov	r6, b
+      000133 FF               [12]  527 	mov	r7, a
+      000134 C0 04            [24]  528 	push	ar4
+      000136 C0 05            [24]  529 	push	ar5
+      000138 C0 06            [24]  530 	push	ar6
+      00013A C0 07            [24]  531 	push	ar7
+                                    532 ;	./backend/backend/outputs/firmware_1746319894.c:105: return temperature;
+      00013C 90 DB 23         [24]  533 	mov	dptr,#0xdb23
+      00013F 75 F0 F9         [24]  534 	mov	b, #0xf9
+      000142 74 3E            [12]  535 	mov	a, #0x3e
+      000144 12 01 A1         [24]  536 	lcall	___fsmul
+      000147 AC 82            [24]  537 	mov	r4, dpl
+      000149 AD 83            [24]  538 	mov	r5, dph
+      00014B AE F0            [24]  539 	mov	r6, b
+      00014D FF               [12]  540 	mov	r7, a
+      00014E E5 81            [12]  541 	mov	a,sp
+      000150 24 FC            [12]  542 	add	a,#0xfc
+      000152 F5 81            [12]  543 	mov	sp,a
+      000154 8C 82            [24]  544 	mov	dpl, r4
+      000156 8D 83            [24]  545 	mov	dph, r5
+      000158 8E F0            [24]  546 	mov	b, r6
+      00015A EF               [12]  547 	mov	a, r7
+                                    548 ;	./backend/backend/outputs/firmware_1746319894.c:106: }
+      00015B 22               [24]  549 	ret
+                                    550 ;------------------------------------------------------------
+                                    551 ;Allocation info for local variables in function 'init_uart'
+                                    552 ;------------------------------------------------------------
+                                    553 ;	./backend/backend/outputs/firmware_1746319894.c:112: void init_uart(void) {
+                                    554 ;	-----------------------------------------
+                                    555 ;	 function init_uart
+                                    556 ;	-----------------------------------------
+      00015C                        557 _init_uart:
+                                    558 ;	./backend/backend/outputs/firmware_1746319894.c:113: SCON = 0x50;   // Mode 1 (8-bit UART), REN=1 (enable receiver)
+      00015C 75 98 50         [24]  559 	mov	_SCON,#0x50
+                                    560 ;	./backend/backend/outputs/firmware_1746319894.c:114: TMOD &= 0x0F;  // Clear Timer 1 bits
+      00015F 53 89 0F         [24]  561 	anl	_TMOD,#0x0f
+                                    562 ;	./backend/backend/outputs/firmware_1746319894.c:115: TMOD |= 0x20;  // Timer 1 in Mode 2 (8-bit auto-reload)
+      000162 43 89 20         [24]  563 	orl	_TMOD,#0x20
+                                    564 ;	./backend/backend/outputs/firmware_1746319894.c:116: TH1 = 0xFD;    // Reload value for 9600 baud with 11.0592MHz crystal
+      000165 75 8D FD         [24]  565 	mov	_TH1,#0xfd
+                                    566 ;	./backend/backend/outputs/firmware_1746319894.c:117: TR1 = 1;       // Start Timer 1
+                                    567 ;	assignBit
+      000168 D2 8E            [12]  568 	setb	_TR1
+                                    569 ;	./backend/backend/outputs/firmware_1746319894.c:118: TI = 1;        // Set TI to indicate ready to transmit
+                                    570 ;	assignBit
+      00016A D2 99            [12]  571 	setb	_TI
+                                    572 ;	./backend/backend/outputs/firmware_1746319894.c:119: }
+      00016C 22               [24]  573 	ret
+                                    574 ;------------------------------------------------------------
+                                    575 ;Allocation info for local variables in function 'uart_tx_char'
+                                    576 ;------------------------------------------------------------
+                                    577 ;c             Allocated to registers 
+                                    578 ;------------------------------------------------------------
+                                    579 ;	./backend/backend/outputs/firmware_1746319894.c:124: void uart_tx_char(char c) {
+                                    580 ;	-----------------------------------------
+                                    581 ;	 function uart_tx_char
+                                    582 ;	-----------------------------------------
+      00016D                        583 _uart_tx_char:
+      00016D 85 82 99         [24]  584 	mov	_SBUF,dpl
+                                    585 ;	./backend/backend/outputs/firmware_1746319894.c:126: while (!TI);   // Wait for transmission to complete
+      000170                        586 00101$:
+                                    587 ;	./backend/backend/outputs/firmware_1746319894.c:127: TI = 0;        // Clear transmission flag
+                                    588 ;	assignBit
+      000170 10 99 02         [24]  589 	jbc	_TI,00118$
+      000173 80 FB            [24]  590 	sjmp	00101$
+      000175                        591 00118$:
+                                    592 ;	./backend/backend/outputs/firmware_1746319894.c:128: }
+      000175 22               [24]  593 	ret
+                                    594 ;------------------------------------------------------------
+                                    595 ;Allocation info for local variables in function 'uart_tx_string'
+                                    596 ;------------------------------------------------------------
+                                    597 ;str           Allocated to registers 
+                                    598 ;------------------------------------------------------------
+                                    599 ;	./backend/backend/outputs/firmware_1746319894.c:133: void uart_tx_string(char *str) {
+                                    600 ;	-----------------------------------------
+                                    601 ;	 function uart_tx_string
+                                    602 ;	-----------------------------------------
+      000176                        603 _uart_tx_string:
+      000176 AD 82            [24]  604 	mov	r5, dpl
+      000178 AE 83            [24]  605 	mov	r6, dph
+      00017A AF F0            [24]  606 	mov	r7, b
+                                    607 ;	./backend/backend/outputs/firmware_1746319894.c:134: while (*str) {
+      00017C                        608 00101$:
+      00017C 8D 82            [24]  609 	mov	dpl,r5
+      00017E 8E 83            [24]  610 	mov	dph,r6
+      000180 8F F0            [24]  611 	mov	b,r7
+      000182 12 0B 58         [24]  612 	lcall	__gptrget
+      000185 FC               [12]  613 	mov	r4,a
+      000186 60 18            [24]  614 	jz	00104$
+                                    615 ;	./backend/backend/outputs/firmware_1746319894.c:135: uart_tx_char(*str++);
+      000188 8C 82            [24]  616 	mov	dpl,r4
+      00018A 0D               [12]  617 	inc	r5
+      00018B BD 00 01         [24]  618 	cjne	r5,#0x00,00120$
+      00018E 0E               [12]  619 	inc	r6
+      00018F                        620 00120$:
+      00018F C0 07            [24]  621 	push	ar7
+      000191 C0 06            [24]  622 	push	ar6
+      000193 C0 05            [24]  623 	push	ar5
+      000195 12 01 6D         [24]  624 	lcall	_uart_tx_char
+      000198 D0 05            [24]  625 	pop	ar5
+      00019A D0 06            [24]  626 	pop	ar6
+      00019C D0 07            [24]  627 	pop	ar7
+      00019E 80 DC            [24]  628 	sjmp	00101$
+      0001A0                        629 00104$:
+                                    630 ;	./backend/backend/outputs/firmware_1746319894.c:137: }
+      0001A0 22               [24]  631 	ret
+                                    632 	.area CSEG    (CODE)
+                                    633 	.area CONST   (CODE)
+                                    634 	.area CONST   (CODE)
+      000BA6                        635 ___str_0:
+      000BA6 53 79 73 74 65 6D 20   636 	.ascii "System initialized"
+             69 6E 69 74 69 61 6C
+             69 7A 65 64
+      000BB8 0D                     637 	.db 0x0d
+      000BB9 0A                     638 	.db 0x0a
+      000BBA 00                     639 	.db 0x00
+                                    640 	.area CSEG    (CODE)
+                                    641 	.area CONST   (CODE)
+      000BBB                        642 ___str_1:
+      000BBB 54 65 6D 70 3A 20 25   643 	.ascii "Temp: %.1f C"
+             2E 31 66 20 43
+      000BC7 0D                     644 	.db 0x0d
+      000BC8 0A                     645 	.db 0x0a
+      000BC9 00                     646 	.db 0x00
+                                    647 	.area CSEG    (CODE)
+                                    648 	.area XINIT   (CODE)
+                                    649 	.area CABS    (ABS,CODE)
