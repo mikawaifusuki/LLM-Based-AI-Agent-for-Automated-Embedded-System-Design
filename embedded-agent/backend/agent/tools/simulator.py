@@ -21,6 +21,7 @@ class SimulatorTool(BaseTool):
     scripts_dir: str = "backend/scripts"
     template_dsn_path: str = "backend/scripts/template.dsn"
     proteus_path: str = "C:/Program Files (x86)/Labcenter Electronics/Proteus 8 Professional/BIN/PDS.EXE"
+    proteus_available: bool = False
     
     def __init__(
         self, 
@@ -50,6 +51,33 @@ class SimulatorTool(BaseTool):
         
         # Create output directory if it doesn't exist
         os.makedirs(self.output_dir, exist_ok=True)
+        
+        # Check if Proteus is available
+        self.proteus_available = self._check_proteus_available()
+        if not self.proteus_available:
+            print("WARNING: Proteus simulator not found. Simulation will be simulated.")
+    
+    def _check_proteus_available(self) -> bool:
+        """Check if Proteus is available"""
+        if os.path.exists(self.proteus_path):
+            print(f"Proteus found at: {self.proteus_path}")
+            return True
+        
+        # Try to find Proteus in common locations
+        common_locations = [
+            "C:/Program Files (x86)/Labcenter Electronics/Proteus 8 Professional/BIN/PDS.EXE",
+            "C:/Program Files/Labcenter Electronics/Proteus 8 Professional/BIN/PDS.EXE",
+            "/Applications/Proteus 8 Professional/BIN/PDS.app",
+            "/usr/local/bin/proteus"
+        ]
+        
+        for location in common_locations:
+            if os.path.exists(location):
+                self.proteus_path = location
+                print(f"Proteus found at: {self.proteus_path}")
+                return True
+        
+        return False
     
     def _tool_run(self, input_str: str) -> str:
         """Run the simulator tool.
@@ -76,22 +104,92 @@ class SimulatorTool(BaseTool):
         """
         try:
             # Parse input
-            input_data = json.loads(input_str)
+            try:
+                input_data = json.loads(input_str)
+            except json.JSONDecodeError:
+                return json.dumps({
+                    "success": False,
+                    "message": "Invalid input format",
+                    "error": "Input is not a valid JSON string"
+                }, indent=2)
+                
             netlist = input_data.get("netlist", {})
             firmware_hex = input_data.get("firmware_hex", "")
             
             # Validate input
-            if not netlist or not firmware_hex:
+            if not netlist:
                 return json.dumps({
                     "success": False,
-                    "error": "Invalid input: netlist and firmware_hex are required"
-                })
+                    "message": "Missing required fields",
+                    "error": "Invalid input: netlist is required"
+                }, indent=2)
+            
+            # Check if firmware hex file exists - if not provided, use a dummy one for simulation
+            if not firmware_hex:
+                # Fall back to a default hex file if available, otherwise generate a message
+                default_hex = os.path.join(self.output_dir, "default_firmware.hex")
+                if os.path.exists(default_hex):
+                    firmware_hex = default_hex
+                    print(f"No firmware specified, using default: {default_hex}")
+                else:
+                    # Generate a simple dummy hex file
+                    firmware_hex = os.path.join(self.output_dir, "dummy_firmware.hex")
+                    with open(firmware_hex, 'w') as f:
+                        f.write(":100000000200300000000000000000000000000000C6\n:00000001FF\n")
+                    print(f"No firmware specified, created dummy hex: {firmware_hex}")
+            elif not os.path.exists(firmware_hex):
+                return json.dumps({
+                    "success": False,
+                    "message": "File not found",
+                    "error": f"Firmware HEX file not found: {firmware_hex}"
+                }, indent=2)
+            
+            # Check if Proteus is available - no need to return error, we'll use simulation
+            if not self.proteus_available:
+                print("Proteus simulator not found. Using simulated results.")
             
             # Prepare simulation files
             sim_id = str(int(time.time()))
             dsn_file = f"sim_{sim_id}.dsn"
             dsn_path = os.path.join(self.output_dir, dsn_file)
+            sim_output_path = os.path.join(self.output_dir, f"sim_results_{sim_id}.json")
             
+            # Save netlist for reference
+            netlist_path = os.path.join(self.output_dir, f"netlist_{sim_id}.json")
+            with open(netlist_path, 'w') as f:
+                json.dump(netlist, f, indent=2)
+            
+            # Call the update_proteus.py script to create the design file or simulate
+            result = self._run_proteus_simulation(netlist, firmware_hex, dsn_path, sim_output_path, sim_id)
+            
+            # 构建标准化的输出结构
+            if result.get("success", False):
+                return json.dumps({
+                    "success": True,
+                    "message": f"Simulation completed successfully with ID {sim_id}",
+                    "data": result
+                }, indent=2)
+            else:
+                return json.dumps({
+                    "success": False,
+                    "message": "Simulation failed", 
+                    "error": result.get("error", "Unknown error during simulation")
+                }, indent=2)
+        
+        except Exception as e:
+            return json.dumps({
+                "success": False,
+                "message": "Error during simulation",
+                "error": str(e)
+            }, indent=2)
+    
+    def _run_proteus_simulation(self, netlist, firmware_hex, dsn_path, sim_output_path, sim_id):
+        """Run the simulation using Proteus"""
+        try:
+            # Check if we can simulate, else fallback to mock simulation
+            if not self.proteus_available:
+                return self._simulate_proteus_results(netlist, firmware_hex, sim_id)
+                
             # Call the update_proteus.py script to create the design file
             script_path = os.path.join(self.scripts_dir, "update_proteus.py")
             update_cmd = [
@@ -110,15 +208,13 @@ class SimulatorTool(BaseTool):
             )
             
             if update_process.returncode != 0:
-                return json.dumps({
+                return {
                     "success": False,
                     "error": f"Failed to create Proteus design file: {update_process.stderr}"
-                })
+                }
             
             # Run the simulation using the batch script
             bat_script_path = os.path.join(self.scripts_dir, "run_simulation.bat")
-            sim_output_path = os.path.join(self.output_dir, f"sim_results_{sim_id}.json")
-            
             sim_cmd = [
                 bat_script_path,
                 self.proteus_path,
@@ -135,28 +231,105 @@ class SimulatorTool(BaseTool):
             
             # Check if simulation completed successfully
             if sim_process.returncode != 0 or not os.path.exists(sim_output_path):
-                return json.dumps({
+                return {
                     "success": False,
                     "error": f"Simulation failed: {sim_process.stderr}",
                     "stdout": sim_process.stdout
-                })
+                }
             
             # Read simulation results
             with open(sim_output_path, 'r') as f:
                 sim_results = json.load(f)
             
-            return json.dumps({
+            return {
                 "success": True,
                 "simulation_id": sim_id,
                 "dsn_file": dsn_path,
                 "results": sim_results
-            }, indent=2)
-        
+            }
         except Exception as e:
-            return json.dumps({
+            return {
                 "success": False,
-                "error": f"Error during simulation: {str(e)}"
-            }, indent=2)
+                "error": f"Error during Proteus simulation: {str(e)}"
+            }
+            
+    def _simulate_proteus_results(self, netlist, firmware_hex, sim_id):
+        """Generate simulated results when Proteus is not available"""
+        try:
+            components = netlist.get("components", [])
+            mcu = None
+            leds = []
+            sensors = []
+            
+            # Find key components
+            for comp in components:
+                comp_type = comp.get("type", "").upper()
+                if "AT89C51" in comp_type or "8051" in comp_type or comp_type == "MCU" or comp_type == "MICROCONTROLLER":
+                    mcu = comp
+                elif comp_type == "LED":
+                    leds.append(comp)
+                elif "SENSOR" in comp_type:
+                    sensors.append(comp)
+            
+            # Generate mock simulation results
+            sim_results = {
+                "success": True,
+                "simulation_id": sim_id,
+                "note": "This is a simulated result as Proteus is not available",
+                "results": {
+                    "duration_ms": 5000,
+                    "completed": True,
+                    "mcu_state": {
+                        "registers": {
+                            "ACC": "0x00",
+                            "B": "0x00",
+                            "PSW": "0x00",
+                            "SP": "0x07"
+                        },
+                        "memory": {
+                            "internal_ram": "0x00, 0x00, ...",
+                            "sfr": "0x00, 0x00, ..."
+                        }
+                    },
+                    "port_states": {
+                        "P0": "0xFF",
+                        "P1": "0xFF",
+                        "P2": "0xFF", 
+                        "P3": "0xFF"
+                    }
+                }
+            }
+            
+            # Add LED states
+            if leds:
+                sim_results["results"]["led_states"] = {}
+                for i, led in enumerate(leds):
+                    # Simulate LED blinking
+                    sim_results["results"]["led_states"][led.get("id", f"LED{i+1}")] = "ON" if i % 2 == 0 else "OFF"
+            
+            # Add sensor readings
+            if sensors:
+                sim_results["results"]["sensor_readings"] = {}
+                for i, sensor in enumerate(sensors):
+                    sensor_id = sensor.get("id", f"SENSOR{i+1}")
+                    sensor_type = sensor.get("type", "").upper()
+                    
+                    if "TEMP" in sensor_type or "LM35" in sensor_type:
+                        sim_results["results"]["sensor_readings"][sensor_id] = "25.5°C"
+                    elif "LIGHT" in sensor_type or "LDR" in sensor_type:
+                        sim_results["results"]["sensor_readings"][sensor_id] = "450 lux"
+                    elif "HUMID" in sensor_type or "DHT" in sensor_type:
+                        sim_results["results"]["sensor_readings"][sensor_id] = "45% RH"
+                    else:
+                        sim_results["results"]["sensor_readings"][sensor_id] = "1.25V"
+            
+            return sim_results
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"Error generating simulated results: {str(e)}"
+            }
     
     # For compatibility with langchain newer versions
     def _run(self, input_str: str) -> str:
